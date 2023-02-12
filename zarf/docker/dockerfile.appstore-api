@@ -1,0 +1,27 @@
+FROM golang:1.19 as build_appstore-api
+ENV CGO_ENABLED 0
+ARG BUILD_REF
+
+
+COPY . /service
+
+WORKDIR /service/service/appstore-api
+RUN go build -ldflags "-X main.build=${BUILD_REF}"
+
+FROM alpine:3.14
+ARG BUILD_DATE
+ARG BUILD_REF
+
+# Pulling the build image from build_appstore-api putting into new container.
+COPY --from=build_appstore-api /service/service/appstore-api /service/appstore-api
+
+WORKDIR /service/appstore-api
+EXPOSE 3000
+CMD ["./appstore-api"]
+
+LABEL org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.title="appstore-api" \
+      org.opencontainers.image.authors="Joshua Seals" \
+      org.opencontainers.image.source="https://github.com/joshua-seals/gopherhelx" \
+      org.opencontainers.image.revision="${BUILD_REF}" \
+      org.opencontainers.image.vendor="Hydruga Solutions"

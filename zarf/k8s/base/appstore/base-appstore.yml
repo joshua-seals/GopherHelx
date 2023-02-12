@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: appstore-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appstore-api
+  namespace: appstore-system
+spec:
+  selector:
+    matchLabels:
+      app: appstore
+  template:
+    metadata:
+      labels:
+        app: appstore
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: appstore-api-pod
+        image: appstore-api-image 
+        ports:
+        - name: appstore-api-port
+          containerPort: 3000
+        # - name: appstore-api-debug
+        #   containerPort: 4000
+        resources:
+        env:
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: KUBERNETES_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: KUBERNETES_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: KUBERNETES_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        # readinessProbe:
+        #   httpGet:
+        #     path: /debug/readiness
+        #     port: 4000
+        #   initialDelaySeconds: 15
+        #   periodSeconds: 15
+        #   timeoutSeconds: 5
+        #   successThreshold: 1
+        #   failureThreshold: 2
+        # livenessProbe:
+        #   httpGet:
+        #     path: /debug/liveness
+        #     port: 4000
+        #   initialDelaySeconds: 30
+        #   periodSeconds: 30
+        #   timeoutSeconds: 5
+        #   successThreshold: 1
+        #   failureThreshold: 2
+          
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: appstore-service
+  namespace: appstore-system
+spec:
+  type: ClusterIP
+  selector:
+    app: appstore
+  ports:
+  - port: 3000
+    name: appstore-api-port
+    targetPort: appstore-api-port
+  # - port: 4000
+  #   name: appstore-api-debug
+  #   targetPort: appstore-api-debug
