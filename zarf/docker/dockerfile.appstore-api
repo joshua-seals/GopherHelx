@@ -16,8 +16,11 @@ ARG BUILD_REF
 COPY --from=build_appstore-api /service/service/appstore-api /service/appstore-api
 
 WORKDIR /service/appstore-api
-EXPOSE 3000
-EXPOSE 4000
+# If just testing the app, uncomment these
+# Otherwise, the ports are set via --config kind in zarf/k8x/kind/kind-config.yml
+# see "make kind-up"
+# EXPOSE 3000
+# EXPOSE 4000
 CMD ["./appstore-api"]
 
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \

@@ -18,8 +18,8 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
       containers:
-      # appstore-api-pod container configuration
-      - name: appstore-api-pod
+      # appstore-pod container configuration
+      - name: appstore-pod
         resources:
           limits:
             cpu: "2000m" # Up to 2 full cores
