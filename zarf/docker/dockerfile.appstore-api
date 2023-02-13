@@ -17,6 +17,7 @@ COPY --from=build_appstore-api /service/service/appstore-api /service/appstore-a
 
 WORKDIR /service/appstore-api
 EXPOSE 3000
+EXPOSE 4000
 CMD ["./appstore-api"]
 
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
