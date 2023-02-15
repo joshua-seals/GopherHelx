@@ -57,9 +57,9 @@ kind-status:
 	kubectl get svc -o wide
 	kubectl get pods -o wide --all-namespaces
 
-# We pipe to our logfmt just for human readable logging here, otherwise we get structured logging.
-# kind-logs:
-# 	kubectl logs -l app=appstore -f --tail=100 | go run app/tooling/logfmt/main.go
+## kind-logs: See last 100 logs for appstore
+kind-logs:
+	kubectl logs -l app=appstore -f --tail=100 
 
 ## kind-restart: Rollout and restart new deployment of appstore-api
 kind-restart:
