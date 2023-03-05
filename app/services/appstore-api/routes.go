@@ -21,7 +21,8 @@ func (app *Application) APIRouter() *chi.Mux {
 
 	router.Get("/app/list", handlers.AppList)
 	router.Get("/{userId}/dashboard", handlers.Dashboard)
-	router.Get("/{userId}/dashboard/session/{appId}/{sessionId}", handlers.Session)
+	router.Get("/{userId}/dashboard/session", handlers.Session)
+	// /{userId}/dashboard/session/{appId}/{sessionId}"
 
 	router.Post("/{userId}/app/install/{appId}", handlers.AppInstall)
 	router.Post("/{userId}/dashboard/start/{appId}", handlers.StartApp)
