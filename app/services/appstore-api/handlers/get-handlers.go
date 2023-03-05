@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/joshua-seals/gopherhelx/business/k8s"
 )
 
 type User struct {
@@ -65,4 +66,5 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 // and routes the user to the corresponding resource.
 func Session(w http.ResponseWriter, r *http.Request) {
 
+	k8s.ListDeployment()
 }
