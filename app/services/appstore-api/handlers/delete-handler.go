@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/joshua-seals/gopherhelx/business/k8s"
 )
 
@@ -15,5 +16,6 @@ func StopApp(w http.ResponseWriter, r *http.Request) {
 // RemoveApp will uninstall the applicaiton from the user dashboard.
 // Subsequently, the app is removed from the user db table purview.
 func RemoveApp(w http.ResponseWriter, r *http.Request) {
-	k8s.DeleteDeployment()
+	app := chi.URLParam(r, "appId")
+	k8s.DeleteDeployment(app)
 }

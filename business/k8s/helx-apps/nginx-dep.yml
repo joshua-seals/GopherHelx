@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: "nginx-dep"
+  name: "nginx-dep"
+  namespace: "appstore-system"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "nginx-dep"
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: "nginx-dep"
+    spec:
+      containers:
+      - image: "nginx:latest"
+        name: "nginx"
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 1
+            memory: "1Gi"
+          requests:
+            cpu: 1
+            memory: "1Gi"
+

@@ -39,5 +39,6 @@ func AppInstall(w http.ResponseWriter, r *http.Request) {
 // specifically to provision a deployment and service resource
 // corresponding to the desired application.
 func StartApp(w http.ResponseWriter, r *http.Request) {
-	k8s.CreateDeployment()
+	// k8s.CreateDeployment()
+	k8s.CreateDeploymentFromFile()
 }
