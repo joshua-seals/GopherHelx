@@ -10,4 +10,6 @@ This application assumes:
   - Micro service patterns are followed throughout the platform (ie. ui and api are split into independent parts)
   - Applications are described in kubernetes manifests.
   - The api handles all kubernetes transactions and routing.
+
+NOTE: Currently, to run this application you need to a role with permissions to create, list, update, delete deployments and pods in the default namespace "appstore-system". This is needed by the business/k8s package.
  
