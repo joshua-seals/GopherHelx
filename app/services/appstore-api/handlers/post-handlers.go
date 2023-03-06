@@ -40,5 +40,6 @@ func AppInstall(w http.ResponseWriter, r *http.Request) {
 // corresponding to the desired application.
 func StartApp(w http.ResponseWriter, r *http.Request) {
 	// k8s.CreateDeployment()
-	k8s.CreateDeploymentFromFile()
+	appId := chi.URLParam(r, "appId")
+	k8s.CreateDeploymentFromFile(appId)
 }

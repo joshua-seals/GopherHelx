@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: jupyter-notebook
+  name: jupyter-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter-notebook
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: jupyter-notebook
+    spec:
+      containers:
+      - image: jupyter/datascience-notebook
+        name: datascience-notebook
+        ports:
+        - containerPort: 8888
+        resources: {}
+status: {}
