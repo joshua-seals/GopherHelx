@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"expvar"
@@ -6,10 +6,12 @@ import (
 	"net/http/pprof"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers"
+	"github.com/jmoiron/sqlx"
+	v1 "github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers/v1"
+	"go.uber.org/zap"
 )
 
-func (app *Application) APIRouter() *chi.Mux {
+func APIMux(log *zap.SugaredLogger, db *sqlx.DB) *chi.Mux {
 	// This router is used in the srv (http.Server) created
 	// as the Handler and is where all api routes are located.
 	// The corresponding functions however will be located in
@@ -19,16 +21,16 @@ func (app *Application) APIRouter() *chi.Mux {
 	// router.Get("/login", handlers.Login)
 	// router.Post("/Userlogin", handlers.UserLogin)
 
-	router.Get("/app/list", handlers.AppList)
-	router.Get("/{userId}/dashboard", handlers.Dashboard)
-	router.Get("/{userId}/dashboard/session", handlers.Session)
+	router.Get("/app/list", v1.AppList)
+	router.Get("/{userId}/dashboard", v1.Dashboard)
+	router.Get("/{userId}/dashboard/session", v1.Session)
 	// /{userId}/dashboard/session/{appId}/{sessionId}"
 
-	router.Post("/{userId}/app/install/{appId}", handlers.AppInstall)
-	router.Post("/{userId}/dashboard/start/{appId}", handlers.StartApp)
+	router.Post("/{userId}/app/install/{appId}", v1.AppInstall)
+	router.Post("/{userId}/dashboard/start/{appId}", v1.StartApp)
 
-	router.Delete("/{userId}/dashboard/stop/{appId}", handlers.StopApp)
-	router.Delete("/{userId}/dashboard/remove/{appId}", handlers.RemoveApp)
+	router.Delete("/{userId}/dashboard/stop/{appId}", v1.StopApp)
+	router.Delete("/{userId}/dashboard/remove/{appId}", v1.RemoveApp)
 
 	return router
 }
@@ -51,15 +53,15 @@ func DebugStandardLibraryMux() *http.ServeMux {
 	return mux
 }
 
-func (app *Application) DebugRouter() http.Handler {
+func DebugMux(log *zap.SugaredLogger, db *sqlx.DB) http.Handler {
 	// Imbed a copy of the above function.
 	mux := DebugStandardLibraryMux()
 
 	// Here we reference a struct from handlers.debug
 	// And Instantiate with app Applicaiton type variables.
-	dbug := handlers.DebugHandler{
-		InfoLog: app.logger.infoLog,
-		ErrLog:  app.logger.errLog,
+	dbug := v1.DebugHandler{
+		Log: log,
+		DB:  db,
 	}
 
 	mux.HandleFunc("/debug/readiness", dbug.Readiness)

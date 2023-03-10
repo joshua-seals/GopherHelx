@@ -1,15 +1,17 @@
-package handlers
+package v1
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"os"
+
+	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 )
 
 type DebugHandler struct {
-	InfoLog *log.Logger
-	ErrLog  *log.Logger
+	Log *zap.SugaredLogger
+	DB  *sqlx.DB
 }
 
 // Readiness checks if the database is ready and if not will return a 500 status.
@@ -25,10 +27,11 @@ func (dbug *DebugHandler) Readiness(w http.ResponseWriter, r *http.Request) {
 	statusCode := http.StatusOK
 
 	if err := response(w, statusCode, data); err != nil {
-		dbug.ErrLog.Print("READINESS: ", err)
+		dbug.Log.Errorln("READINESS: ", err)
+
 	}
 
-	dbug.InfoLog.Print("READINESS: ", "statusCode: ", statusCode, " method: ", r.Method, " path: ", r.URL.Path, " remoteaddr: ", r.RemoteAddr)
+	dbug.Log.Infoln("READINESS: ", "statusCode: ", statusCode, " method: ", r.Method, " path: ", r.URL.Path, " remoteaddr: ", r.RemoteAddr)
 }
 
 // Liveness returns simple status info if the service is alive. If the
@@ -59,12 +62,12 @@ func (dbug *DebugHandler) Liveness(w http.ResponseWriter, r *http.Request) {
 
 	statusCode := http.StatusOK
 	if err := response(w, statusCode, data); err != nil {
-		dbug.ErrLog.Print("LIVENESS: ", err)
+		dbug.Log.Errorln("LIVENESS: ", err)
 	}
 
 	// THIS IS A FREE TIMER. WE COULD UPDATE THE METRIC GOROUTINE COUNT HERE.
 
-	dbug.InfoLog.Print("LIVENESS: ", " statusCode: ", statusCode, " method: ", r.Method, " path: ", r.URL.Path, " remoteaddr: ", r.RemoteAddr)
+	dbug.Log.Infoln("LIVENESS: ", " statusCode: ", statusCode, " method: ", r.Method, " path: ", r.URL.Path, " remoteaddr: ", r.RemoteAddr)
 }
 
 func response(w http.ResponseWriter, statusCode int, data any) error {

@@ -1,6 +1,6 @@
 // All PUT method handlers are located herein which service the
 // appstore-api
-package handlers
+package v1
 
 import (
 	"fmt"
@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/joshua-seals/gopherhelx/business/k8s"
 )
 
 var apps = map[int]string{1: "Webtop", 2: "Filebrowser", 3: "Jupyter", 4: "Balsam", 5: "PGAdmin"}
@@ -40,6 +39,6 @@ func AppInstall(w http.ResponseWriter, r *http.Request) {
 // corresponding to the desired application.
 func StartApp(w http.ResponseWriter, r *http.Request) {
 	// k8s.CreateDeployment()
-	appId := chi.URLParam(r, "appId")
-	k8s.CreateDeploymentFromFile(appId)
+	// appId := chi.URLParam(r, "appId")
+	// k8s.CreateDeploymentFromFile(appId)
 }
