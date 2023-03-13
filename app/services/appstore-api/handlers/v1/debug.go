@@ -10,8 +10,9 @@ import (
 )
 
 type DebugHandler struct {
-	Log *zap.SugaredLogger
-	DB  *sqlx.DB
+	Build string
+	Log   *zap.SugaredLogger
+	DB    *sqlx.DB
 }
 
 // Readiness checks if the database is ready and if not will return a 500 status.
@@ -46,6 +47,7 @@ func (dbug *DebugHandler) Liveness(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		Status    string `json:"status,omitempty"`
+		Build     string `json:"build,omitempty"`
 		Host      string `json:"host,omitempty"`
 		Name      string `json:"name,omitempty"`
 		PodIP     string `json:"podIP,omitempty"`
@@ -53,6 +55,7 @@ func (dbug *DebugHandler) Liveness(w http.ResponseWriter, r *http.Request) {
 		Namespace string `json:"namespace,omitempty"`
 	}{
 		Status:    "up",
+		Build:     dbug.Build,
 		Host:      host,
 		Name:      os.Getenv("KUBERNETES_NAME"),
 		PodIP:     os.Getenv("KUBERNETES_POD_IP"),

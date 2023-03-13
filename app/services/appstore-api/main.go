@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
+	"expvar"
 	"fmt"
 	"net/http"
 	"os"
@@ -9,17 +11,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ardanlabs/conf"
 	"github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers"
-	databse "github.com/joshua-seals/gopherhelx/foundation/database"
+	"github.com/joshua-seals/gopherhelx/foundation/database"
 	"github.com/joshua-seals/gopherhelx/foundation/logger"
 	"go.uber.org/zap"
 )
 
-type Config struct {
-	apiPort   int
-	debugPort int
-	env       string
-}
+var build = "develop"
 
 func main() {
 
@@ -49,7 +48,7 @@ func run(log *zap.SugaredLogger) error {
 	// to the correspondent exepcting struct in the packages
 	// imported into main.
 	cfg := struct {
-		Config
+		conf.Version
 		Web struct {
 			APIHOST         string        `conf:"default:0.0.0.0:3000"`
 			DebugHost       string        `conf:"default:0.0.0.0:4000"`
@@ -68,12 +67,33 @@ func run(log *zap.SugaredLogger) error {
 			DisableTLS   bool   `conf:"default:true"`
 		}
 	}{
-		Config: Config{
-			apiPort:   3000,
-			debugPort: 4000,
-			env:       "dev",
+		Version: conf.Version{
+			SVN:  build,
+			Desc: "MIT License - Copyright (c) 2023 RENCI - Renaissance Computing Institute",
 		},
 	}
+
+	const prefix = "APPSTORE"
+	help, err := conf.ParseOSArgs(prefix, &cfg)
+	if err != nil {
+		if errors.Is(err, conf.ErrHelpWanted) {
+			fmt.Println(help)
+			return nil
+		}
+		return fmt.Errorf("parsing config: %w", err)
+	}
+
+	// =========================================================================
+	// App Starting
+
+	log.Infow("starting service", "version", build)
+	defer log.Infow("shutdown complete")
+
+	out, err := conf.String(&cfg)
+	if err != nil {
+		return fmt.Errorf("generating config for output: %w", err)
+	}
+	log.Infow("startup", "config", out)
 
 	// =========================================================================
 	// Database Support
@@ -81,7 +101,7 @@ func run(log *zap.SugaredLogger) error {
 	// Create connectivity to the database.
 	log.Infow("startup", "status", "initializing database support", "host", cfg.DB.Host)
 
-	db, err := databse.Open(databse.Config{
+	db, err := database.Open(database.Config{
 		User:         cfg.DB.User,
 		Password:     cfg.DB.Password,
 		Host:         cfg.DB.Host,
@@ -103,8 +123,10 @@ func run(log *zap.SugaredLogger) error {
 
 	log.Infow("startup", "status", "debug router started", "host", cfg.Web.DebugHost)
 
+	expvar.NewString("build").Set(build)
+
 	// Create custom debugServer
-	debugMux := handlers.DebugMux(log, db)
+	debugMux := handlers.DebugMux(build, log, db)
 
 	// Start the service listening for debug requests.
 	// Not concerned with shutting this down with load shedding, ie don't need custom http.Server object
@@ -124,16 +146,15 @@ func run(log *zap.SugaredLogger) error {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
 
-	apiMux := handlers.APIMux(handlers.APIMuxConfig{
+	apiMux := handlers.APIRoutes(handlers.APICoreConfig{
 		Shutdown: shutdown,
 		Log:      log,
-		Auth:     auth,
 		DB:       db,
 	})
 	// Construct a server to service requests against the mux
 	api := http.Server{
 		Addr:         cfg.Web.APIHOST,
-		Handler:      apiMux,
+		Handler:      apiMux.ApiMux,
 		ReadTimeout:  cfg.Web.ReadTimeout,
 		WriteTimeout: cfg.Web.WriteTimeout,
 		IdleTimeout:  cfg.Web.IdleTimeout,

@@ -4,33 +4,37 @@ import (
 	"expvar"
 	"net/http"
 	"net/http/pprof"
+	"os"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 	v1 "github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers/v1"
+	"github.com/joshua-seals/gopherhelx/foundation/web"
 	"go.uber.org/zap"
 )
 
-func APIMux(log *zap.SugaredLogger, db *sqlx.DB) *chi.Mux {
+// APIMuxConfig contains all the mandatory systems required by handlers.
+type APICoreConfig struct {
+	Shutdown chan os.Signal
+	Log      *zap.SugaredLogger
+	DB       *sqlx.DB
+}
+
+func APIRoutes(cfg APICoreConfig) *web.APIRouter {
 	// This router is used in the srv (http.Server) created
 	// as the Handler and is where all api routes are located.
 	// The corresponding functions however will be located in
 	// handlers package.
-	router := chi.NewRouter()
+	router := web.NewAPIRouter(cfg.Shutdown, *cfg.Log, cfg.DB)
 
-	// router.Get("/login", handlers.Login)
-	// router.Post("/Userlogin", handlers.UserLogin)
+	router.ApiMux.Get("/app/list", v1.AppList)
+	router.ApiMux.Post("/app/new", v1.NewApplication)
+	router.ApiMux.Post("/app/install/{appId}/{userId}", v1.AddToDashboard)
 
-	router.Get("/app/list", v1.AppList)
-	router.Get("/{userId}/dashboard", v1.Dashboard)
-	router.Get("/{userId}/dashboard/session", v1.Session)
-	// /{userId}/dashboard/session/{appId}/{sessionId}"
-
-	router.Post("/{userId}/app/install/{appId}", v1.AppInstall)
-	router.Post("/{userId}/dashboard/start/{appId}", v1.StartApp)
-
-	router.Delete("/{userId}/dashboard/stop/{appId}", v1.StopApp)
-	router.Delete("/{userId}/dashboard/remove/{appId}", v1.RemoveApp)
+	router.ApiMux.Get("/dashboard/{userId}", v1.Dashboard)
+	router.ApiMux.Post("/dashboard/{userId}/start/{appId}", v1.StartApp)
+	router.ApiMux.Get("/dashboard/{userId}/session/{appId}/{sessionId}", v1.ViewApp)
+	router.ApiMux.Delete("/dashboard/{userId}/stop/{appId}", v1.StopApp)
+	router.ApiMux.Delete("/dashboard/{userId}/remove/{appId}", v1.RemoveApp)
 
 	return router
 }
@@ -53,15 +57,16 @@ func DebugStandardLibraryMux() *http.ServeMux {
 	return mux
 }
 
-func DebugMux(log *zap.SugaredLogger, db *sqlx.DB) http.Handler {
+func DebugMux(build string, log *zap.SugaredLogger, db *sqlx.DB) http.Handler {
 	// Imbed a copy of the above function.
 	mux := DebugStandardLibraryMux()
 
 	// Here we reference a struct from handlers.debug
 	// And Instantiate with app Applicaiton type variables.
 	dbug := v1.DebugHandler{
-		Log: log,
-		DB:  db,
+		Build: build,
+		Log:   log,
+		DB:    db,
 	}
 
 	mux.HandleFunc("/debug/readiness", dbug.Readiness)
