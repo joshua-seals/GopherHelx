@@ -48,7 +48,7 @@ kind-load:
 # Load db first, wait 120, then apply appstore api
 ## kind-apply: Apply kustomize build into kubernetes.
 kind-apply:
-	kustomize build zarf/k8s/kind/database-pod | kubectl apply -f -
+	kustomize build zarf/k8s/kind/database | kubectl apply -f -
 	kubectl wait --namespace=database-system --timeout=120s --for=condition=Available deployment/database-pod
 	kustomize build zarf/k8s/kind/appstore | kubectl apply -f -
 

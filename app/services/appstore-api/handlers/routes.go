@@ -25,16 +25,19 @@ func APIRoutes(cfg APIMuxConfig) *chi.Mux {
 	// The corresponding functions however will be located in
 	// handlers package.
 	router := chi.NewRouter()
+	core := v1.CoreHandler{
+		Log: cfg.Log,
+	}
 
-	router.Get("/app/list", v1.AppList)
-	router.Post("/app/new", v1.NewApplication)
-	router.Post("/app/install/{appId}/{userId}", v1.AddToDashboard)
+	router.Get("/app/list", core.AppList)
+	router.Post("/app/new", core.NewApplication)
+	router.Post("/app/install/{appId}/{userId}", core.AddToDashboard)
 
-	router.Get("/dashboard/{userId}", v1.Dashboard)
-	router.Post("/dashboard/{userId}/start/{appId}", v1.StartApp)
-	router.Get("/dashboard/{userId}/session/{appId}/{sessionId}", v1.ViewApp)
-	router.Delete("/dashboard/{userId}/stop/{appId}", v1.StopApp)
-	router.Delete("/dashboard/{userId}/remove/{appId}", v1.RemoveApp)
+	router.Get("/dashboard/{userId}", core.Dashboard)
+	router.Post("/dashboard/{userId}/start/{appId}", core.StartApp)
+	router.Get("/dashboard/{userId}/session/{appId}/{sessionId}", core.ViewApp)
+	router.Delete("/dashboard/{userId}/stop/{appId}", core.StopApp)
+	router.Delete("/dashboard/{userId}/remove/{appId}", core.RemoveApp)
 
 	return router
 }

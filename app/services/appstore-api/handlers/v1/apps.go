@@ -16,7 +16,7 @@ var apps = map[int]string{1: "Webtop", 2: "Filebrowser", 3: "Jupyter", 4: "Balsa
 // AddToDashboard installs a selected app from app/list into user dashboard.
 // This action also triggers an update to the user db table
 // where the app is then added to specific user dashboard.
-func AddToDashboard(w http.ResponseWriter, r *http.Request) {
+func (c CoreHandler) AddToDashboard(w http.ResponseWriter, r *http.Request) {
 	// Dummy Data
 	user := chi.URLParam(r, "userId")
 	appId, err := strconv.Atoi(chi.URLParam(r, "appId"))
@@ -33,16 +33,16 @@ func AddToDashboard(w http.ResponseWriter, r *http.Request) {
 
 // Applist shows the list of applications available
 // for a user to install in their dashboard.
-func AppList(w http.ResponseWriter, r *http.Request) {
+func (c CoreHandler) AppList(w http.ResponseWriter, r *http.Request) {
 	apps := apps
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(apps)
 	if err != nil {
-		fmt.Println(err)
+		c.Log.Error(err)
 	}
 }
 
 // NewApplication supports the installation of a new application.
-func NewApplication(w http.ResponseWriter, r *http.Request) {
+func (c CoreHandler) NewApplication(w http.ResponseWriter, r *http.Request) {
 
 }

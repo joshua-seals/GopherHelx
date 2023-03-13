@@ -14,7 +14,7 @@ import (
 // Dashboard shows the installed applications in the user
 // specific dashboard. Dashboard is the entrypoint for
 // users to start and stop applications.
-func Dashboard(w http.ResponseWriter, r *http.Request) {
+func (c CoreHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 
 	req_user := chi.URLParam(r, "userId")
 	if user, ok := UserDb[req_user]; ok {
@@ -33,13 +33,13 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 // ViewApp is the user's connection point
 // to a specific service & app
 // governed by a session id.
-func ViewApp(w http.ResponseWriter, r *http.Request) {
+func (c CoreHandler) ViewApp(w http.ResponseWriter, r *http.Request) {
 
 	k8s.ListDeployment()
 }
 
 // StartApp deploys an installed application from the user dashboard.
-func StartApp(w http.ResponseWriter, r *http.Request) {
+func (c CoreHandler) StartApp(w http.ResponseWriter, r *http.Request) {
 	// k8s.CreateDeployment()
 	// appId := chi.URLParam(r, "appId")
 	// k8s.CreateDeploymentFromFile(appId)
@@ -47,13 +47,13 @@ func StartApp(w http.ResponseWriter, r *http.Request) {
 
 // StopApp will delete the currently deployed application
 // from the user table and dashboard.
-func StopApp(w http.ResponseWriter, r *http.Request) {
+func (c CoreHandler) StopApp(w http.ResponseWriter, r *http.Request) {
 
 }
 
 // RemoveApp will uninstall the applicaiton from the user dashboard.
 // Subsequently, the app is removed from the user db table purview.
-func RemoveApp(w http.ResponseWriter, r *http.Request) {
+func (c CoreHandler) RemoveApp(w http.ResponseWriter, r *http.Request) {
 	app := chi.URLParam(r, "appId")
 	k8s.DeleteDeployment(app)
 }
