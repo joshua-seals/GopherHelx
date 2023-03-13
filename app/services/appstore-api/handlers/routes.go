@@ -6,35 +6,35 @@ import (
 	"net/http/pprof"
 	"os"
 
+	"github.com/go-chi/chi"
 	"github.com/jmoiron/sqlx"
 	v1 "github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers/v1"
-	"github.com/joshua-seals/gopherhelx/foundation/web"
 	"go.uber.org/zap"
 )
 
 // APIMuxConfig contains all the mandatory systems required by handlers.
-type APICoreConfig struct {
+type APIMuxConfig struct {
 	Shutdown chan os.Signal
 	Log      *zap.SugaredLogger
 	DB       *sqlx.DB
 }
 
-func APIRoutes(cfg APICoreConfig) *web.APIRouter {
+func APIRoutes(cfg APIMuxConfig) *chi.Mux {
 	// This router is used in the srv (http.Server) created
 	// as the Handler and is where all api routes are located.
 	// The corresponding functions however will be located in
 	// handlers package.
-	router := web.NewAPIRouter(cfg.Shutdown, *cfg.Log, cfg.DB)
+	router := chi.NewRouter()
 
-	router.ApiMux.Get("/app/list", v1.AppList)
-	router.ApiMux.Post("/app/new", v1.NewApplication)
-	router.ApiMux.Post("/app/install/{appId}/{userId}", v1.AddToDashboard)
+	router.Get("/app/list", v1.AppList)
+	router.Post("/app/new", v1.NewApplication)
+	router.Post("/app/install/{appId}/{userId}", v1.AddToDashboard)
 
-	router.ApiMux.Get("/dashboard/{userId}", v1.Dashboard)
-	router.ApiMux.Post("/dashboard/{userId}/start/{appId}", v1.StartApp)
-	router.ApiMux.Get("/dashboard/{userId}/session/{appId}/{sessionId}", v1.ViewApp)
-	router.ApiMux.Delete("/dashboard/{userId}/stop/{appId}", v1.StopApp)
-	router.ApiMux.Delete("/dashboard/{userId}/remove/{appId}", v1.RemoveApp)
+	router.Get("/dashboard/{userId}", v1.Dashboard)
+	router.Post("/dashboard/{userId}/start/{appId}", v1.StartApp)
+	router.Get("/dashboard/{userId}/session/{appId}/{sessionId}", v1.ViewApp)
+	router.Delete("/dashboard/{userId}/stop/{appId}", v1.StopApp)
+	router.Delete("/dashboard/{userId}/remove/{appId}", v1.RemoveApp)
 
 	return router
 }
