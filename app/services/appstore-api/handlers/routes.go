@@ -1,34 +1,43 @@
-package main
+package handlers
 
 import (
 	"expvar"
 	"net/http"
 	"net/http/pprof"
+	"os"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers"
+	"github.com/go-chi/chi"
+	"github.com/jmoiron/sqlx"
+	v1 "github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers/v1"
+	"go.uber.org/zap"
 )
 
-func (app *Application) APIRouter() *chi.Mux {
+// APIMuxConfig contains all the mandatory systems required by handlers.
+type APIMuxConfig struct {
+	Shutdown chan os.Signal
+	Log      *zap.SugaredLogger
+	DB       *sqlx.DB
+}
+
+func APIRoutes(cfg APIMuxConfig) *chi.Mux {
 	// This router is used in the srv (http.Server) created
 	// as the Handler and is where all api routes are located.
 	// The corresponding functions however will be located in
 	// handlers package.
 	router := chi.NewRouter()
+	core := v1.CoreHandler{
+		Log: cfg.Log,
+	}
 
-	// router.Get("/login", handlers.Login)
-	// router.Post("/Userlogin", handlers.UserLogin)
+	router.Get("/app/list", core.AppList)
+	router.Post("/app/new", core.NewApplication)
+	router.Post("/app/install/{appId}/{userId}", core.AddToDashboard)
 
-	router.Get("/app/list", handlers.AppList)
-	router.Get("/{userId}/dashboard", handlers.Dashboard)
-	router.Get("/{userId}/dashboard/session", handlers.Session)
-	// /{userId}/dashboard/session/{appId}/{sessionId}"
-
-	router.Post("/{userId}/app/install/{appId}", handlers.AppInstall)
-	router.Post("/{userId}/dashboard/start/{appId}", handlers.StartApp)
-
-	router.Delete("/{userId}/dashboard/stop/{appId}", handlers.StopApp)
-	router.Delete("/{userId}/dashboard/remove/{appId}", handlers.RemoveApp)
+	router.Get("/dashboard/{userId}", core.Dashboard)
+	router.Post("/dashboard/{userId}/start/{appId}", core.StartApp)
+	router.Get("/dashboard/{userId}/session/{appId}/{sessionId}", core.ViewApp)
+	router.Delete("/dashboard/{userId}/stop/{appId}", core.StopApp)
+	router.Delete("/dashboard/{userId}/remove/{appId}", core.RemoveApp)
 
 	return router
 }
@@ -51,15 +60,16 @@ func DebugStandardLibraryMux() *http.ServeMux {
 	return mux
 }
 
-func (app *Application) DebugRouter() http.Handler {
+func DebugMux(build string, log *zap.SugaredLogger, db *sqlx.DB) http.Handler {
 	// Imbed a copy of the above function.
 	mux := DebugStandardLibraryMux()
 
 	// Here we reference a struct from handlers.debug
 	// And Instantiate with app Applicaiton type variables.
-	dbug := handlers.DebugHandler{
-		InfoLog: app.logger.infoLog,
-		ErrLog:  app.logger.errLog,
+	dbug := v1.DebugHandler{
+		Build: build,
+		Log:   log,
+		DB:    db,
 	}
 
 	mux.HandleFunc("/debug/readiness", dbug.Readiness)

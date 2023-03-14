@@ -45,10 +45,11 @@ kind-load:
 	cd zarf/k8s/kind/appstore; kustomize edit set image appstore-api-image=appstore-api-arm64:$(VERSION)
 	kind load docker-image appstore-api-arm64:$(VERSION) --name $(KIND_CLUSTER)
 
-# Can use cat for file then use as input for apply -f
-# cat zarf/k8s/base/appstore-pod/base-appstore.yml | kubectl apply -f -
+# Load db first, wait 120, then apply appstore api
 ## kind-apply: Apply kustomize build into kubernetes.
 kind-apply:
+	kustomize build zarf/k8s/kind/database | kubectl apply -f -
+	kubectl wait --namespace=database-system --timeout=120s --for=condition=Available deployment/database-pod
 	kustomize build zarf/k8s/kind/appstore | kubectl apply -f -
 
 ## kind-status: Get status of nodes, svc, and pods in all namespaces.
@@ -69,13 +70,14 @@ kind-restart:
 kind-status-appstore:
 	kubectl get pods -o wide -w
 
-# kind-status-db:
-# 	kubectl get pods -o wide -w --namespace=database-system
+## kind-status-db: Get status of the database
+kind-status-db:
+	kubectl get pods -o wide -w --namespace=database-system
 
 ## kind-update: Update runs docker build and restarts the deployment with new rollout.
 kind-update: all kind-load kind-restart
 
-## kind-update-apply: Runs docker build, rollout and restart and kustomize patching.
+## kind-update-apply: Runs docker build, load and kustomize patching.
 kind-update-apply: all kind-load kind-apply
 
 ## kind-describe: Describes the pods with label=appstore
