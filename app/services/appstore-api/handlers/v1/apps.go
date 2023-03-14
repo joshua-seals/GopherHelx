@@ -50,24 +50,22 @@ func (c CoreHandler) AddNewApplication(w http.ResponseWriter, r *http.Request) {
 	newApp := models.Application{}
 	err := json.NewDecoder(r.Body).Decode(&newApp)
 	if err != nil {
-
-		c.Log.Errorln(err, "Decoding New App ", newApp)
+		// c.logError(r, err, newApp)
+		c.serverErrorResponse(w, r, err)
 	}
 	// Add contexting information
 	ctx := context.TODO()
 	appId, err := newApp.AddNewApplication(ctx, c.DB)
 	if err != nil {
-		status := http.StatusInternalServerError
-		c.logError(r, err)
-		json.NewEncoder(w).Encode(status)
+		c.serverErrorResponse(w, r, err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	status := http.StatusAccepted
-	response := fmt.Sprintf("status: %d, app_id: %s", status, appId)
-	err = json.NewEncoder(w).Encode(response)
+	data := envelope{"application ": appId}
+	//fmt.Sprintf("status: %d, app_id: %s", status, appId)
+	c.writeJSON(w, status, data, nil)
 	if err != nil {
-		status :=
-			c.Log.Errorln("Error: ", err, "status: ", http.StatusInternalServerError, "Encoding New App ID Response", response)
+		c.serverErrorResponse(w, r, err)
 	}
 }

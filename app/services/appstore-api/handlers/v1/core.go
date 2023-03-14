@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-// CoreHandler can hold middleware, context, and logger, etc.
+// CoreHandler can hold middleware, telemetry, logger, etc.
 // This struct will bind the API associated methods
 // found in apps.go, dashboard.go and any helpers needed for
 // standardization of data flow.

@@ -15,8 +15,9 @@ import (
 
 /*
 TODO:
-	- Chi middleware needs to user zap logger.
-	- Ensure context is passed through handlers.
+	- Chi needs to use zap logger instead of chi middleware.logger.
+		" router.Use(middleware.Logger) "
+	- Ensure context is passed through handlers where appropriate.
 */
 
 // APIMuxConfig contains all the mandatory systems required by handlers.
@@ -26,11 +27,14 @@ type APIMuxConfig struct {
 	DB       *sqlx.DB
 }
 
+// APIRoutes holds all api routes currently served.
 func APIRoutes(cfg APIMuxConfig) *chi.Mux {
 	// This router is used in the srv (http.Server) created
 	// as the Handler and is where all api routes are located.
 	// The corresponding functions however will be located in
-	// handlers package.
+	// v1 package. This allows for simultaneous work and testing of
+	// new routes from a v2 api, without the need to change every
+	// endpoint.
 	router := chi.NewRouter()
 
 	core := v1.CoreHandler{
@@ -38,6 +42,9 @@ func APIRoutes(cfg APIMuxConfig) *chi.Mux {
 		DB:  cfg.DB,
 	}
 	router.Use(middleware.Logger)
+	router.NotFound(core.NotFoundResponse)
+	router.MethodNotAllowed(core.MethodNotAllowedResponse)
+
 	router.Get("/app/list", core.AppList)
 	router.Post("/app/new", core.AddNewApplication)
 	router.Post("/app/install/{appId}/{userId}", core.AddToDashboard)
