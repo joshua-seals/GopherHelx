@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/ardanlabs/conf"
+	"github.com/joshua-seals/gopherhelx/app/foundation/database"
+	"github.com/joshua-seals/gopherhelx/app/foundation/logger"
 	"github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers"
-	"github.com/joshua-seals/gopherhelx/foundation/database"
-	"github.com/joshua-seals/gopherhelx/foundation/logger"
 	"go.uber.org/zap"
 )
 
@@ -44,7 +44,7 @@ func run(log *zap.SugaredLogger) error {
 	// We only pull in packages to main, careful to avoid global level access.
 	// To do so a common pattern here is to mirror the package level
 	// structures in this annonomous struct, then to pass down
-	// necessary api libraries like context, logger, db, etc
+	// necessary structures like context, logger, db, etc
 	// to the correspondent exepcting struct in the packages
 	// imported into main.
 	cfg := struct {
@@ -195,26 +195,5 @@ func run(log *zap.SugaredLogger) error {
 	}
 
 	return nil
-
-	// // Create custom apiServer mux
-	// apiServer := handlers.APIRouter(log, db)
-
-	// shutdown := make(chan os.Signal, 1)
-	// signal.Notify(shutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-
-	// serverErrors := make(chan error, 1)
-	// go func() {
-	// 	app.logger.infoLog.Printf("starting server on %d", app.config.apiPort)
-	// 	serverErrors <- apiServer.ListenAndServe()
-	// }()
-
-	// // Listen on error and shutdown channels
-	// select {
-	// case err := <-serverErrors:
-	// 	app.logger.errLog.Println("Received error signal: ", err)
-	// case sig := <-shutdown:
-	// 	app.logger.infoLog.Println("Received signal: ", sig)
-	// 	app.logger.infoLog.Println("Performing shutdown operations.")
-	// }
 
 }

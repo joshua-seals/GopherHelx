@@ -7,10 +7,17 @@ import (
 	"os"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/jmoiron/sqlx"
 	v1 "github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers/v1"
 	"go.uber.org/zap"
 )
+
+/*
+TODO:
+	- Chi middleware needs to user zap logger.
+	- Ensure context is passed through handlers.
+*/
 
 // APIMuxConfig contains all the mandatory systems required by handlers.
 type APIMuxConfig struct {
@@ -25,10 +32,11 @@ func APIRoutes(cfg APIMuxConfig) *chi.Mux {
 	// The corresponding functions however will be located in
 	// handlers package.
 	router := chi.NewRouter()
+
 	core := v1.CoreHandler{
 		Log: cfg.Log,
 	}
-
+	router.Use(middleware.Logger)
 	router.Get("/app/list", core.AppList)
 	router.Post("/app/new", core.NewApplication)
 	router.Post("/app/install/{appId}/{userId}", core.AddToDashboard)

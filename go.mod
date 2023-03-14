@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/ardanlabs/conf v1.5.0
+	github.com/ardanlabs/darwin v1.5.0
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/jmoiron/sqlx v1.3.5

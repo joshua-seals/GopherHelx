@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/joshua-seals/gopherhelx/business/k8s"
+	"github.com/joshua-seals/gopherhelx/app/business/k8s"
 )
 
 // Dashboard shows the installed applications in the user
@@ -38,9 +38,8 @@ func (c CoreHandler) ViewApp(w http.ResponseWriter, r *http.Request) {
 	k8s.ListDeployment()
 }
 
-// StartApp deploys an installed application from the user dashboard.
+// StartApp deploys an application from the user dashboard to kubernetes env.
 func (c CoreHandler) StartApp(w http.ResponseWriter, r *http.Request) {
-	// k8s.CreateDeployment()
 	// appId := chi.URLParam(r, "appId")
 	// k8s.CreateDeploymentFromFile(appId)
 }

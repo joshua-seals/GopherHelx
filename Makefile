@@ -84,6 +84,15 @@ kind-update-apply: all kind-load kind-apply
 kind-describe:
 	kubectl describe pod -l app=appstore
 
+# ==============================================================================
+# Administration
+
+migrate:
+	go run app/tooling/admin/main.go migrate
+
+seed: migrate
+	go run app/tooling/admin/main.go seed
+
 #===================================================================
 # Managing go packages by downloading with 'tidy'
 # keeping local copy of package dependency with 'vendor'
