@@ -35,10 +35,11 @@ func APIRoutes(cfg APIMuxConfig) *chi.Mux {
 
 	core := v1.CoreHandler{
 		Log: cfg.Log,
+		DB:  cfg.DB,
 	}
 	router.Use(middleware.Logger)
 	router.Get("/app/list", core.AppList)
-	router.Post("/app/new", core.NewApplication)
+	router.Post("/app/new", core.AddNewApplication)
 	router.Post("/app/install/{appId}/{userId}", core.AddToDashboard)
 
 	router.Get("/dashboard/{userId}", core.Dashboard)

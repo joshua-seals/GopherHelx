@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
 
@@ -13,6 +14,7 @@ import (
 // standardization of data flow.
 type CoreHandler struct {
 	Log *zap.SugaredLogger
+	DB  *sqlx.DB
 }
 
 type envelope map[string]any

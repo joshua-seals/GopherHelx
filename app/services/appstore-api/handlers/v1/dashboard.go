@@ -21,7 +21,7 @@ func (c CoreHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		err := json.NewEncoder(w).Encode(user)
 		if err != nil {
-			fmt.Println(err)
+			c.Log.Errorln(err)
 		}
 
 	} else {

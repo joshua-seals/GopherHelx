@@ -28,47 +28,10 @@ var (
 
 func int32Ptr(i int32) *int32 { return &i }
 
-// func CreateDeploymentFromFile(appId string) {
-// 	// Deploy from a manifest file.
-// 	// https://medium.com/@harshjniitr/reading-and-writing-k8s-resource-as-yaml-in-golang-81dc8c7ea800
-// 	decode := scheme.Codecs.UniversalDeserializer().Decode
-// 	appFile := fmt.Sprintf("helx-apps/%s.yml", appId)
-// 	stream, err := helxFs.ReadFile(appFile)
-// 	if err != nil {
-// 		fmt.Println(err, appFile)
-// 	}
-// 	obj, gKV, _ := decode(stream, nil, nil)
-// 	deployment := &appsv1.Deployment{}
-// 	if gKV.Kind == "Deployment" {
-// 		deployment = obj.(*appsv1.Deployment)
-// 	}
-
-// 	// creates the in-cluster config
-// 	config, err := rest.InClusterConfig()
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-// 	// creates the clientset
-// 	clientset, err := kubernetes.NewForConfig(config)
-// 	if err != nil {
-// 		panic(err.Error())
-// 	}
-// 	// Specify namespace in Deployments object "appstore-system"
-// 	deploymentsClient := clientset.AppsV1().Deployments("appstore-system")
-
-// 	// Create Deployment
-// 	fmt.Println("Creating deployment...")
-// 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
-// }
-
 // This function will govern the Deployments.
 // And a struct containing pertinent information will be populated and
 // passed to CreateDeployment() for creation.
-func CreateDeployment(appId string) {
+func CreateDeployment() {
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -168,3 +131,40 @@ func DeleteDeployment(appname string) {
 	}
 	fmt.Println("Deleted deployment.")
 }
+
+// func CreateDeploymentFromFile(appId string) {
+// 	// Deploy from a manifest file.
+// 	// https://medium.com/@harshjniitr/reading-and-writing-k8s-resource-as-yaml-in-golang-81dc8c7ea800
+// 	decode := scheme.Codecs.UniversalDeserializer().Decode
+// 	appFile := fmt.Sprintf("helx-apps/%s.yml", appId)
+// 	stream, err := helxFs.ReadFile(appFile)
+// 	if err != nil {
+// 		fmt.Println(err, appFile)
+// 	}
+// 	obj, gKV, _ := decode(stream, nil, nil)
+// 	deployment := &appsv1.Deployment{}
+// 	if gKV.Kind == "Deployment" {
+// 		deployment = obj.(*appsv1.Deployment)
+// 	}
+
+// 	// creates the in-cluster config
+// 	config, err := rest.InClusterConfig()
+// 	if err != nil {
+// 		panic(err.Error())
+// 	}
+// 	// creates the clientset
+// 	clientset, err := kubernetes.NewForConfig(config)
+// 	if err != nil {
+// 		panic(err.Error())
+// 	}
+// 	// Specify namespace in Deployments object "appstore-system"
+// 	deploymentsClient := clientset.AppsV1().Deployments("appstore-system")
+
+// 	// Create Deployment
+// 	fmt.Println("Creating deployment...")
+// 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
+// }
