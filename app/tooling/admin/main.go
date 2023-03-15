@@ -12,8 +12,6 @@ import (
 
 func main() {
 
-	// err := genKey()
-	// err := genToken()
 	err := migrate()
 
 	if err != nil {

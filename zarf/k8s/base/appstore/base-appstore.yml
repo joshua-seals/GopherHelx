@@ -20,6 +20,12 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
       terminationGracePeriodSeconds: 60
+      # appstore-api init container configuration
+      # migrations and seeding take place on startup
+      initContainers:
+      - name: init-migrate
+        image: appstore-api-image
+        command: ['./admin/admin']
       containers:
       - name: appstore-pod
         image: appstore-api-image 

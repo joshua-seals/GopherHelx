@@ -49,7 +49,7 @@ kind-load:
 ## kind-apply: Apply kustomize build into kubernetes.
 kind-apply:
 	kustomize build zarf/k8s/kind/database | kubectl apply -f -
-	kubectl wait --namespace=database-system --timeout=120s --for=condition=Available deployment/database-pod
+	kubectl wait --namespace=appstore-system --timeout=120s --for=condition=Available deployment/database-pod
 	kustomize build zarf/k8s/kind/appstore | kubectl apply -f -
 
 ## kind-status: Get status of nodes, svc, and pods in all namespaces.
@@ -66,13 +66,19 @@ kind-logs:
 kind-restart:
 	kubectl rollout restart deployment appstore-api
 
+
+## kind-restart-all: Rollout and restart new deployment of appstore-api and database-pod
+kind-restart-all:
+	kubectl rollout restart deployment appstore-api
+	kubectl restart deployment --namespace=database-system database-pod
+
 ## kind-status-appstore: Get status of just pods
 kind-status-appstore:
 	kubectl get pods -o wide -w
 
 ## kind-status-db: Get status of the database
 kind-status-db:
-	kubectl get pods -o wide -w --namespace=database-system
+	kubectl get pods -o wide -w --namespace=appstore-system
 
 ## kind-update: Update runs docker build and restarts the deployment with new rollout.
 kind-update: all kind-load kind-restart
@@ -87,9 +93,11 @@ kind-describe:
 # ==============================================================================
 # Administration
 
+## migrate: Run admin data migrations on db.
 migrate:
 	go run app/tooling/admin/main.go migrate
 
+## seed: Will make and seed the db with new information. 
 seed: migrate
 	go run app/tooling/admin/main.go seed
 

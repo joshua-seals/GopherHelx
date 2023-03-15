@@ -3,9 +3,14 @@ ENV CGO_ENABLED 0
 ARG BUILD_REF
 
 
-COPY . /service
+COPY . /gopherhelx
 
-WORKDIR /service/app/services/appstore-api
+# Build the admin binary
+WORKDIR /gopherhelx/app/tooling/admin
+RUN go build -ldflags "-X main.build=${BUILD_REF}"
+
+# Build the appstore-api binary
+WORKDIR /gopherhelx/app/services/appstore-api
 RUN go build -ldflags "-X main.build=${BUILD_REF}"
 
 FROM alpine:3.14
@@ -13,19 +18,21 @@ ARG BUILD_DATE
 ARG BUILD_REF
 
 # Pulling the build image from build_appstore-api putting into new container.
-COPY --from=build_appstore-api /service/app/services/appstore-api /service/appstore-api
+# to path was /gopherhelx/admin
+COPY --from=build_appstore-api /gopherhelx/app/tooling/admin /gopherhelx/admin
+COPY --from=build_appstore-api /gopherhelx/app/services/appstore-api /gopherhelx/appstore-api
 
-WORKDIR /service/appstore-api
+WORKDIR /gopherhelx
 # If just testing the app, uncomment these
 # Otherwise, the ports are set via --config kind in zarf/k8x/kind/kind-config.yml
 # see "make kind-up"
 # EXPOSE 3000
 # EXPOSE 4000
-CMD ["./appstore-api"]
+CMD ["./appstore-api/appstore-api"]
 
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.title="appstore-api" \
       org.opencontainers.image.authors="Joshua Seals" \
       org.opencontainers.image.source="https://github.com/joshua-seals/gopherhelx" \
       org.opencontainers.image.revision="${BUILD_REF}" \
-      org.opencontainers.image.vendor="Hydruga Solutions"
+      org.opencontainers.image.vendor="RENCI - Renaissance Computing Institute"

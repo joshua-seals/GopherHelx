@@ -37,16 +37,18 @@ func APIRoutes(cfg APIMuxConfig) *chi.Mux {
 	// endpoint.
 	router := chi.NewRouter()
 
+	// Core binds the v1 handlers
 	core := v1.CoreHandler{
 		Log: cfg.Log,
 		DB:  cfg.DB,
 	}
+
 	router.Use(middleware.Logger)
 	router.NotFound(core.NotFoundResponse)
 	router.MethodNotAllowed(core.MethodNotAllowedResponse)
 
 	router.Get("/app/list", core.AppList)
-	router.Post("/app/new", core.AddNewApplication)
+	router.Post("/app/new", core.NewApplication)
 	router.Post("/app/install/{appId}/{userId}", core.AddToDashboard)
 
 	router.Get("/dashboard/{userId}", core.Dashboard)
@@ -66,6 +68,7 @@ func DebugStandardLibraryMux() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// Register all the standard library debug endpoints.
+	// These debug endpoints can be viewed at localhost:4000/debug/pprof
 	mux.HandleFunc("/debug/pprof/", pprof.Index)
 	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
 	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)

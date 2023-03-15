@@ -45,7 +45,7 @@ func (c CoreHandler) AppList(w http.ResponseWriter, r *http.Request) {
 }
 
 // NewApplication supports the installation of a new application.
-func (c CoreHandler) AddNewApplication(w http.ResponseWriter, r *http.Request) {
+func (c CoreHandler) NewApplication(w http.ResponseWriter, r *http.Request) {
 
 	newApp := models.Application{}
 	err := json.NewDecoder(r.Body).Decode(&newApp)

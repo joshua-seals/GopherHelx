@@ -23,6 +23,6 @@ type Application struct {
 // via the models method newApplication.
 // Returns the newly installed appId or error
 func (a *Application) AddNewApplication(ctx context.Context, db *sqlx.DB) (string, error) {
-
+	//const p := 'INSERT INTO table applications values (app_name, image, port)'
 	return "123", nil
 }
