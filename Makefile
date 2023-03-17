@@ -37,6 +37,7 @@ kind-up:
 	kubectl config set-context --current --namespace=appstore-system
 
 ## kind-default-CRB: Create cr and crbinding for appstore to manage pods and services.
+# Only needed to run once when first creating cluster.
 kind-default-CRB:
 	kubectl create clusterrole \
 	appstore-manager-role \
@@ -73,11 +74,11 @@ kind-apply:
 	kubectl wait --namespace=appstore-system --timeout=120s --for=condition=Available deployment/database-pod
 	kustomize build zarf/k8s/kind/appstore | kubectl apply -f -
 
-## kind-status: Get status of nodes, svc, and pods in all namespaces.
+## kind-status: Get status of nodes, svc, and pods.
 kind-status:
 	kubectl get nodes -o wide
 	kubectl get svc -o wide
-	kubectl get pods -o wide --all-namespaces
+	kubectl get pods -o wide 
 
 ## kind-logs: See last 100 logs for appstore
 kind-logs:
@@ -102,9 +103,11 @@ kind-status-db:
 	kubectl get pods -o wide -w --namespace=appstore-system
 
 ## kind-update: Update runs docker build and restarts the deployment with new rollout.
+# Use this if you edit application code.
 kind-update: all kind-load kind-restart
 
 ## kind-update-apply: Runs docker build, load and kustomize patching.
+# Use this if you edit zarf/ files.
 kind-update-apply: all kind-load kind-apply
 
 ## kind-describe: Describes the pods with label=appstore
