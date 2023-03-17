@@ -36,6 +36,27 @@ kind-up:
 		--config zarf/k8s/kind/kind-config.yml
 	kubectl config set-context --current --namespace=appstore-system
 
+## kind-default-CRB: Create cr and crbinding for appstore to manage pods and services.
+kind-default-CRB:
+	kubectl create clusterrole \
+	appstore-manager-role \
+	--verb=get,list,watch,update,delete,create,patch \
+	--resource=pods,pods/status,deployments,deployments/status,services,services/status,replicasets
+	kubectl create clusterrolebinding \
+	appstore-manager-binding \
+	--namespace=appstore-system \
+	--clusterrole=appstore-manager-role \
+	--serviceaccount=default:default
+
+# To verify serviceaccount and clusterrolebinding
+# kubectl get rolebindings,clusterrolebindings \
+  --all-namespaces  \
+  -o custom-columns='KIND:kind,NAMESPACE:metadata.namespace,NAME:metadata.name,SERVICE_ACCOUNTS:subjects[?(@.kind=="ServiceAccount")].name' | grep "default"
+
+
+# NOTE: This role and role binding are used by rest.InClusterConfig() in business/k8s package
+# in order to authenticate the appstore pod to the k8s api server.
+
 ## kind-down: Delete the kind cluster
 kind-down:
 	kind delete cluster --name $(KIND_CLUSTER)
