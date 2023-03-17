@@ -146,11 +146,9 @@ func run(log *zap.SugaredLogger) error {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
 
-	apiMux := handlers.APIRoutes(handlers.APIMuxConfig{
-		Shutdown: shutdown,
-		Log:      log,
-		DB:       db,
-	})
+	// We could pass shutdown through routes to encourage
+	// graceful shutdown.
+	apiMux := handlers.APIRoutes(log, db)
 	// Construct a server to service requests against the mux
 	api := http.Server{
 		Addr:         cfg.Web.APIHOST,

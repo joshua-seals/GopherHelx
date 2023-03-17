@@ -4,7 +4,6 @@ import (
 	"expvar"
 	"net/http"
 	"net/http/pprof"
-	"os"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -20,15 +19,8 @@ TODO:
 	- Ensure context is passed through handlers where appropriate.
 */
 
-// APIMuxConfig contains all the mandatory systems required by handlers.
-type APIMuxConfig struct {
-	Shutdown chan os.Signal
-	Log      *zap.SugaredLogger
-	DB       *sqlx.DB
-}
-
 // APIRoutes holds all api routes currently served.
-func APIRoutes(cfg APIMuxConfig) *chi.Mux {
+func APIRoutes(log *zap.SugaredLogger, db *sqlx.DB) *chi.Mux {
 	// This router is used in the srv (http.Server) created
 	// as the Handler and is where all api routes are located.
 	// The corresponding functions however will be located in
@@ -39,8 +31,8 @@ func APIRoutes(cfg APIMuxConfig) *chi.Mux {
 
 	// Core binds the v1 handlers
 	core := v1.CoreHandler{
-		Log: cfg.Log,
-		DB:  cfg.DB,
+		Log: log,
+		DB:  db,
 	}
 
 	router.Use(middleware.Logger)
