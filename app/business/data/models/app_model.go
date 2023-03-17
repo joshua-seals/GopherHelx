@@ -4,8 +4,11 @@ package models
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/joshua-seals/gopherhelx/app/foundation/database"
 )
 
 // Application only needs a few things to describe it.
@@ -24,5 +27,13 @@ type Application struct {
 // Returns the newly installed appId or error
 func (a *Application) AddNewApplication(ctx context.Context, db *sqlx.DB) (string, error) {
 	//const p := 'INSERT INTO table applications values (app_name, image, port)'
+	if err := database.StatusCheck(ctx, db); err != nil {
+		return "", fmt.Errorf("status check database: %w", err)
+
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
 	return "123", nil
 }
