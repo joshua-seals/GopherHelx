@@ -11,7 +11,7 @@ This application assumes:
   - Applications are described in kubernetes manifests.
   - The api handles all kubernetes transactions and routing.
 
-The design of this application uses a base from ardan labs ultimate service and tries to stay consistent with package oriented design philosophy, ie business logic is contained in the business package, while foundational code will be held in the foundation package. This should allow for independent module testing throughout the life of the project. 
+The design of this application uses a base design gleened from ![ardan-labs-service](https://github.com/ardanlabs/service) and tries to stay consistent with ![package oriented design philosophies](https://www.ardanlabs.com/blog/2017/02/package-oriented-design.html) to aid in developer mental models of the architecture and guide development efforts within the project. Meaning, "business logic" is contained in the `business` package, while foundational code will be held in the `foundation` package, and the core api service will be held in the `services` package. This should allow for independent module testing as well. 
 
 The intent of the application redesign is to address inconsistencies observed in day to day use of the appstore api with `maintainability` , `release processes and updates` and `outside entity adoption` being a core focus. 
 
