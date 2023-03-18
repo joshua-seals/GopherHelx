@@ -22,7 +22,7 @@ A NOTE ON ADDING APPLICATIONS: While the concept is simple at face value, this i
 This api did not allow the current ui to inform decisions about routes and functionality, but rather is a reworking of both. The api should inform the ui.
 The functionality as it relates from the end user perspective at the ui level is show below.
 
-![alt text](https://github.com/joshua-seals/gopherhelx/blob/main/app-list-endpoints.png?raw=true)
+![alt text](https://github.com/joshua-seals/gopherhelx/blob/main/zarf/images/app-list-endpoints.png?raw=true)
 
 
  
