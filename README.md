@@ -19,8 +19,9 @@ Due care was put into the desired functionality for other entities to adopt and 
 
 A NOTE ON ADDING APPLICATIONS: While the concept is simple at face value, this is also a large consideration as data will likely need to persist. The current state of this applciation does not address physical volumes (pv) or pvc creation.
 
-This api did not allow the current ui to inform decisions about routes and functionality, but rather is a reworking of both. The api should inform the ui.
-The functionality as it relates from the end user perspective at the ui level is show below.
+The Gopherhelx api did not give consideration to the current `helx-ui` therefore integration of this api will necessitate reworking of both. 
+
+The functionality of the api endpoints as they relate to the end user perspective within the user interface (ui) is depicted below.
 
 ![alt text](https://github.com/joshua-seals/gopherhelx/blob/main/zarf/images/app-list-endpoints.png?raw=true)
 
