@@ -20,7 +20,7 @@ type CoreHandler struct {
 type envelope map[string]any
 
 // Method for maintaining a standard response to the client.
-func (c *CoreHandler) writeJSON(w http.ResponseWriter, status int, data envelope, headers http.Header) error {
+func (c *CoreHandler) writeJSON(w http.ResponseWriter, status int, data any, headers http.Header) error {
 	js, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		return err

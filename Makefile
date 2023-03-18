@@ -92,7 +92,7 @@ kind-restart:
 ## kind-restart-all: Rollout and restart new deployment of appstore-api and database-pod
 kind-restart-all:
 	kubectl rollout restart deployment appstore-api
-	kubectl restart deployment --namespace=database-system database-pod
+	kubectl rollout restart deployment database-pod
 
 ## kind-status-appstore: Get status of just pods
 kind-status-appstore:
@@ -118,12 +118,15 @@ kind-describe:
 # Administration
 
 ## migrate: Run admin data migrations on db.
-migrate:
-	go run app/tooling/admin/main.go migrate
+# migrate:
+# 	go run app/tooling/admin/main.go migrate
 
-## seed: Will make and seed the db with new information. 
-seed: migrate
-	go run app/tooling/admin/main.go seed
+# ## seed: Will make and seed the db with new information. 
+# seed: migrate
+# 	go run app/tooling/admin/main.go seed
+
+# delete: 
+# 	go run app/tooling/admin/main.go 3
 
 #===================================================================
 # Managing go packages by downloading with 'tidy'

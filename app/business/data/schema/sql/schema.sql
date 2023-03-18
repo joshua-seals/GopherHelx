@@ -3,7 +3,7 @@
 -- Ideally we use UUID where SERIAL exists but 
 -- currently it is not implemented.
 CREATE TABLE users (
-    user_id INTEGER,
+    user_id SERIAL,
     user_name TEXT,
     session TEXT UNIQUE,
 
@@ -13,18 +13,19 @@ CREATE TABLE users (
 -- Version: 1.2
 -- Description: Create table applications
 CREATE TABLE applications (
-	app_id   INTEGER,
+	app_id   SERIAL,
 	app_name TEXT,
     image    TEXT,
-	port     TEXT,
+	port     INTEGER,
 
 	PRIMARY KEY (app_id)
 );
 
 -- Version: 1.3
 -- Description: Create table dashboard
+-- dash_id should be created based on session and user id
 CREATE TABLE dashboard (
-	dash_id      INTEGER,
+	dash_id      SERIAL,
 	user_id      INTEGER,
 	app_id  	 INTEGER,
 	user_session TEXT,

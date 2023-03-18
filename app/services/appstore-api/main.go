@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/ardanlabs/conf"
-	"github.com/joshua-seals/gopherhelx/app/foundation/database"
+	"github.com/joshua-seals/gopherhelx/app/business/sys/database"
 	"github.com/joshua-seals/gopherhelx/app/foundation/logger"
 	"github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers"
 	"go.uber.org/zap"

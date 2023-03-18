@@ -7,7 +7,7 @@ import (
 
 	"github.com/ardanlabs/darwin"
 	"github.com/jmoiron/sqlx"
-	"github.com/joshua-seals/gopherhelx/app/foundation/database"
+	"github.com/joshua-seals/gopherhelx/app/business/sys/database"
 )
 
 // Embed schema, seed, and delete into the strings.
