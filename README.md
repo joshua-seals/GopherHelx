@@ -23,7 +23,7 @@ The Gopherhelx api did not give consideration to the current `helx-ui` therefore
 
 The functionality of the api endpoints as they relate to the end user perspective within the user interface (ui) is depicted below.
 
-![alt text](https://github.com/joshua-seals/gopherhelx/blob/main/zarf/images/app-list-endpoints.png?raw=true)
+![alt text](https://github.com/joshua-seals/gopherhelx/blob/readme-illustration/.readme-images/images/app-list-endpoints.png?raw=true)
 
 
  
