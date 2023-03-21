@@ -3,11 +3,12 @@
 package v1
 
 import (
-	"encoding/json"
-	"fmt"
+	"context"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/joshua-seals/gopherhelx/app/business/data/models"
 	"github.com/joshua-seals/gopherhelx/app/business/k8s"
 )
 
@@ -16,18 +17,25 @@ import (
 // users to start and stop applications.
 func (c CoreHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 
-	req_user := chi.URLParam(r, "userId")
-	if user, ok := UserDb[req_user]; ok {
-		w.Header().Set("Content-Type", "application/json")
-		err := json.NewEncoder(w).Encode(user)
-		if err != nil {
-			c.Log.Errorln(err)
-		}
+	userId, err := strconv.Atoi(chi.URLParam(r, "userId"))
+	if err != nil {
+		c.serverErrorResponse(w, r, err)
+		return
+	}
+	ctx := context.Background()
+	userDash, err := models.GetDashboard(ctx, c.DB, userId)
 
-	} else {
-		fmt.Fprintf(w, "User not found: %d", http.StatusNotFound)
+	if err != nil {
+		c.serverErrorResponse(w, r, err)
+		return
 	}
 
+	status := http.StatusAccepted
+	data := envelope{"dashboard": userDash}
+	if err := c.writeJSON(w, status, data, nil); err != nil {
+		c.serverErrorResponse(w, r, err)
+		return
+	}
 }
 
 // ViewApp is the user's connection point

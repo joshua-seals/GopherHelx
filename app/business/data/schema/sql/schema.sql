@@ -23,15 +23,9 @@ CREATE TABLE applications (
 
 -- Version: 1.3
 -- Description: Create table dashboard
--- dash_id should be created based on session and user id
 CREATE TABLE dashboard (
-	dash_id      SERIAL,
-	user_id      INTEGER,
-	app_id  	 INTEGER,
-	user_session TEXT,
-
-	PRIMARY KEY (dash_id),
-	FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-	FOREIGN KEY (app_id) REFERENCES applications (app_id) ON DELETE CASCADE,
-	FOREIGN KEY (user_session) REFERENCES users (session) ON DELETE CASCADE
+	users_dash_id INTEGER ,
+	users_session TEXT,
+	apps_app_id  INTEGER,
+	PRIMARY KEY (users_dash_id, users_session, apps_app_id)
 );

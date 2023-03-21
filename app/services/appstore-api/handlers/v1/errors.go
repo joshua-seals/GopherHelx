@@ -15,6 +15,7 @@ var (
 
 func (c *CoreHandler) logError(r *http.Request, err error, message any) {
 	c.Log.Errorln(err, "url-string: ", r.URL.String())
+	return
 }
 
 func (c *CoreHandler) errorResponse(w http.ResponseWriter, r *http.Request, status int, message any) {

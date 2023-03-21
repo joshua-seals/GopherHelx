@@ -10,7 +10,7 @@ help:
 VERSION := 1.0.0
 
 ## all: run appstore-api to build docker image.
-all: appstore-api
+image: appstore-api
 
 ## appstore-api: Build docker image for api from zarf/docker/dockerfile.appstore-api
 appstore-api:
@@ -104,11 +104,11 @@ kind-status-db:
 
 ## kind-update: Update runs docker build and restarts the deployment with new rollout.
 # Use this if you edit application code.
-kind-update: all kind-load kind-restart
+kind-update: image kind-load kind-restart
 
 ## kind-update-apply: Runs docker build, load and kustomize patching.
 # Use this if you edit zarf/ files.
-kind-update-apply: all kind-load kind-apply
+kind-update-apply: image kind-load kind-apply
 
 ## kind-describe: Describes the pods with label=appstore
 kind-describe:

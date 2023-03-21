@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"net/http/pprof"
 
-	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
 	"github.com/jmoiron/sqlx"
 	v1 "github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers/v1"
 	"go.uber.org/zap"
@@ -16,7 +16,6 @@ import (
 TODO:
 	- Chi needs to use zap logger instead of chi middleware.logger.
 		" router.Use(middleware.Logger) "
-	- Ensure context is passed through handlers where appropriate.
 */
 
 // APIRoutes holds all api routes currently served.
@@ -41,11 +40,11 @@ func APIRoutes(log *zap.SugaredLogger, db *sqlx.DB) *chi.Mux {
 
 	router.Get("/app/list", core.AppList)
 	router.Post("/app/new", core.NewApplication)
-	router.Post("/app/install/{appId}/{userId}", core.AddToDashboard)
 
 	router.Get("/dashboard/{userId}", core.Dashboard)
+	router.Post("/dashboard/{userId}/install/{appId}", core.AddToDashboard)
 	router.Post("/dashboard/{userId}/start/{appId}", core.StartApp)
-	router.Get("/dashboard/{userId}/session/{appId}/{sessionId}", core.ViewApp)
+	router.Get("/dashboard/{userId}/{sessionId}/connect/{appId}", core.ViewApp)
 	router.Delete("/dashboard/{userId}/stop/{appId}", core.StopApp)
 	router.Delete("/dashboard/{userId}/remove/{appId}", core.RemoveApp)
 

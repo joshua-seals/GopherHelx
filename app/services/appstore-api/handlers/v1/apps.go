@@ -25,12 +25,14 @@ func (c CoreHandler) AppList(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		c.serverErrorResponse(w, r, err)
+		return
 	}
 
 	status := http.StatusAccepted
 	data := envelope{"applist": apps}
 	if err := c.writeJSON(w, status, data, nil); err != nil {
 		c.serverErrorResponse(w, r, err)
+		return
 	}
 
 }
@@ -43,6 +45,7 @@ func (c CoreHandler) NewApplication(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// c.logError(r, err, newApp)
 		c.serverErrorResponse(w, r, err)
+		return
 	}
 	// Add contexting information
 	ctx := context.TODO()
@@ -58,5 +61,6 @@ func (c CoreHandler) NewApplication(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.writeJSON(w, status, data, nil); err != nil {
 		c.serverErrorResponse(w, r, err)
+		return
 	}
 }
