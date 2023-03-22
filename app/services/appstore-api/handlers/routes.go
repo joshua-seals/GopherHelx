@@ -16,6 +16,8 @@ import (
 TODO:
 	- Chi needs to use zap logger instead of chi middleware.logger.
 		" router.Use(middleware.Logger) "
+	- Add User Authorization
+	- Add 'stateful' authentication tokens.
 */
 
 // APIRoutes holds all api routes currently served.
@@ -43,7 +45,7 @@ func APIRoutes(log *zap.SugaredLogger, db *sqlx.DB) *chi.Mux {
 
 	router.Get("/dashboard/{userId}", core.Dashboard)
 	router.Post("/dashboard/{userId}/install/{appId}", core.AddToDashboard)
-	router.Post("/dashboard/{userId}/start/{appId}", core.StartApp)
+	router.Put("/dashboard/{userId}/start/{appId}", core.StartApp)
 	router.Get("/dashboard/{userId}/{sessionId}/connect/{appId}", core.ViewApp)
 	router.Delete("/dashboard/{userId}/stop/{appId}", core.StopApp)
 	router.Delete("/dashboard/{userId}/remove/{appId}", core.RemoveApp)

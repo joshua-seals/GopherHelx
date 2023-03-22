@@ -10,13 +10,6 @@ import (
 	"github.com/joshua-seals/gopherhelx/app/business/data/models"
 )
 
-// AddToDashboard installs a selected app from app/list into user dashboard.
-// This action also triggers an update to the user db table
-// where the app is then added to specific user dashboard.
-func (c CoreHandler) AddToDashboard(w http.ResponseWriter, r *http.Request) {
-
-}
-
 // Applist shows the list of applications available
 // for a user to install in their dashboard.
 func (c CoreHandler) AppList(w http.ResponseWriter, r *http.Request) {

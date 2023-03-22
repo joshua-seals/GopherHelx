@@ -26,7 +26,7 @@ type Dashboard struct {
 // for any given user and their associated sessions.
 type UserDashboard []Dashboard
 
-func GetDashboard(ctx context.Context, db *sqlx.DB, userID int) (UserDashboard, error) {
+func GetDashboard(ctx context.Context, db *sqlx.DB, userID string) (UserDashboard, error) {
 	if err := database.StatusCheck(ctx, db); err != nil {
 		return UserDashboard{}, fmt.Errorf("status check database: %w", err)
 	}
@@ -35,20 +35,13 @@ func GetDashboard(ctx context.Context, db *sqlx.DB, userID int) (UserDashboard, 
 	defer cancel()
 
 	const getDashboard = `SELECT * from dashboard where users_dash_id = $1`
-	rows, err := db.QueryContext(ctx, getDashboard, userID)
+	var userDash UserDashboard
+	err := db.SelectContext(ctx, &userDash, getDashboard, userID)
 	if err != nil {
+		fmt.Println("Error with SelectContext")
 		return UserDashboard{}, err
 	}
-	defer rows.Close()
-	var userDash UserDashboard
-	for rows.Next() {
-		d := Dashboard{}
-		err := rows.Scan(&d.DashID, &d.UserSession, &d.AppID)
-		if err != nil {
-			return UserDashboard{}, err
-		}
-		userDash = append(userDash, d)
-	}
+
 	return userDash, nil
 }
 
@@ -59,7 +52,7 @@ func GetDeploymentInfo(ctx context.Context, db *sqlx.DB, userID string, appId st
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	fmt.Println("CHECKING VALS", userID, appId)
+
 	var d Dashboard
 	const getDashboard = `SELECT * from dashboard WHERE users_dash_id=$1 AND apps_app_id=$2;`
 	err := db.GetContext(ctx, &d, getDashboard, userID, appId)

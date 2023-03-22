@@ -29,7 +29,7 @@ type Apps []Application
 
 // Returns the newly installed appId and error.
 func (a *Application) AddNewApplication(ctx context.Context, db *sqlx.DB) (string, error) {
-	// https://go.dev/doc/database/execute-transactions
+
 	if err := database.StatusCheck(ctx, db); err != nil {
 		return "", fmt.Errorf("status check database: %w", err)
 	}
@@ -41,19 +41,7 @@ func (a *Application) AddNewApplication(ctx context.Context, db *sqlx.DB) (strin
 	if err != nil {
 		return "", err
 	}
-	// Check to make sure app doesn't already exist.
-	// If so, return the response error.
-	// var checkApp = Application{}
-	// checkQuery := "SELECT * from applications where app_name=$1"
-	// err = tx.QueryRow(checkQuery, a.AppName).Scan(&checkApp)
 
-	// if ok := errors.Is(err, ErrNoRows); !ok {
-	// 	return "", err
-	// }
-	// if checkApp.AppName == a.AppName {
-	// 	response := fmt.Errorf("Application by this name is instaled already %s", a.AppName)
-	// 	return "", response
-	// }
 	var id int
 	const insertApp = `
 	INSERT INTO applications 
@@ -84,29 +72,12 @@ func AppList(ctx context.Context, db *sqlx.DB) (Apps, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	// tx, err := db.Begin()
-	// if err != nil {
-	// 	return Apps{}, err
-	// }
 	const getApps = `SELECT * from applications;`
-	rows, err := db.QueryContext(ctx, getApps)
+	var appList Apps
+	err := db.SelectContext(ctx, &appList, getApps)
 	if err != nil {
 		return Apps{}, err
 	}
-	// No errors we commit the Select statement.
-	// err = tx.Commit()
-	// if err != nil {
-	// 	return Apps{}, err
-	// }
-	defer rows.Close()
-	var appList Apps
-	for rows.Next() {
-		a := Application{}
-		err := rows.Scan(&a.AppID, &a.AppName, &a.Image, &a.Port)
-		if err != nil {
-			return Apps{}, err
-		}
-		appList = append(appList, a)
-	}
+
 	return appList, nil
 }
