@@ -38,16 +38,21 @@ kind-up:
 
 ## kind-default-CRB: Create cr and crbinding for appstore to manage pods and services.
 # Only needed to run once when first creating cluster.
+# Still honing this so for hacking, it is cluster-admin roles (VERY INSECURE!!!)
 kind-default-CRB:
-	kubectl create clusterrole \
-	appstore-manager-role \
-	--verb=get,list,watch,update,delete,create,patch \
-	--resource=pods,pods/status,deployments,deployments/status,services,services/status,replicasets
-	kubectl create clusterrolebinding \
-	appstore-manager-binding \
-	--namespace=appstore-system \
-	--clusterrole=appstore-manager-role \
-	--serviceaccount=default:default
+	kubectl create clusterrolebinding serviceaccounts-cluster-admin \
+	--clusterrole=cluster-admin \
+	--group=system:serviceaccounts
+
+# kubectl create clusterrole \
+# appstore-manager-role \
+# --verb=get,list,watch,update,delete,create,patch \
+# --resource=*.apps,deployment.apps,pods,pods/status,deployments,deployments/status,services,services/status,replicasets
+# kubectl create clusterrolebinding \
+# appstore-manager-binding \
+# --namespace=appstore-system \
+# --clusterrole=appstore-manager-role \
+# --serviceaccount=default:default
 
 # To verify serviceaccount and clusterrolebinding
 # kubectl get rolebindings,clusterrolebindings \

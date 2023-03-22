@@ -9,7 +9,10 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/joshua-seals/gopherhelx/app/business/sys/database"
+	_ "github.com/lib/pq"
 )
+
+// Important: Note the silent import of _ github.com/lib/pq
 
 // The DashID is the UserId.
 type Dashboard struct {
@@ -47,4 +50,29 @@ func GetDashboard(ctx context.Context, db *sqlx.DB, userID int) (UserDashboard, 
 		userDash = append(userDash, d)
 	}
 	return userDash, nil
+}
+
+func GetDeploymentInfo(ctx context.Context, db *sqlx.DB, userID string, appId string) (Dashboard, Application, error) {
+	if err := database.StatusCheck(ctx, db); err != nil {
+		return Dashboard{}, Application{}, fmt.Errorf("status check database: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	fmt.Println("CHECKING VALS", userID, appId)
+	var d Dashboard
+	const getDashboard = `SELECT * from dashboard WHERE users_dash_id=$1 AND apps_app_id=$2;`
+	err := db.GetContext(ctx, &d, getDashboard, userID, appId)
+	if err != nil {
+		return Dashboard{}, Application{}, err
+	}
+
+	var a Application
+	const getApplication = `SELECT * from applications where app_id = $1;`
+	err = db.GetContext(ctx, &a, getApplication, appId)
+	if err != nil {
+		return Dashboard{}, Application{}, err
+	}
+
+	return d, a, nil
 }

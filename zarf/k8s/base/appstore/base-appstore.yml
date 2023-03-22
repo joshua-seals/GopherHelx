@@ -34,7 +34,8 @@ spec:
           containerPort: 3000
         - name: appstore-debug
           containerPort: 4000
-        # resources:
+        # Using Kubernetes downward api to pass info to our 
+        # readiness and liveness probes.
         env:
         - name: KUBERNETES_NAMESPACE
           valueFrom:

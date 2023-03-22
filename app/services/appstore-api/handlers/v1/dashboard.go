@@ -6,6 +6,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joshua-seals/gopherhelx/app/business/data/models"
@@ -48,8 +49,34 @@ func (c CoreHandler) ViewApp(w http.ResponseWriter, r *http.Request) {
 
 // StartApp deploys an application from the user dashboard to kubernetes env.
 func (c CoreHandler) StartApp(w http.ResponseWriter, r *http.Request) {
-	// appId := chi.URLParam(r, "appId")
-	// k8s.CreateDeploymentFromFile(appId)
+	userId := chi.URLParam(r, "userId")
+
+	appId := chi.URLParam(r, "appId")
+
+	ctx := context.Background()
+	d, a, err := models.GetDeploymentInfo(ctx, c.DB, userId, appId)
+	if err != nil {
+		c.serverErrorResponse(w, r, err)
+		return
+	}
+	// TODO: Need to dynamically pull namespace
+	// Ensure data follows kubernetes requirements
+	// ie. lowercase naming and remove ToLower mess.
+	depName := strings.ToLower(a.AppName + "-" + d.UserSession)
+	deployment := k8s.Deployment{
+		DName:      depName,
+		DNamespace: "appstore-system",
+		DLabels: map[string]string{
+			"apps": strings.ToLower(a.AppName),
+		},
+		AName:  strings.ToLower(a.AppName),
+		AImage: a.Image,
+		APort:  a.Port,
+	}
+	err = deployment.CreateDeployment()
+	if err != nil {
+		c.serverErrorResponse(w, r, err)
+	}
 }
 
 // StopApp will delete the currently deployed application
