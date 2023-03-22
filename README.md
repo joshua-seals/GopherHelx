@@ -19,7 +19,7 @@ This method of organization and visualization is similar to how the OSI Model an
 ### Intent
 The intent of the application redesign is to address inconsistencies observed in day to day use of the appstore api with `maintainability` , `release processes, updates` and `outside entity adoption` being a core focus. 
 
-Due care was put into the design to support the helxplatform's adoption and smooth usage outside of UNC, with special focus being from perspective of a system engineer or admin who would be tasked with the platform up in their own environment. This means api design should support user customizations via restful api calls (ie branding and adding new apps).
+Due care was put into the design to support the helxplatform's adoption and smooth usage outside of UNC, with special focus being from perspective of a system engineer or admin who would be tasked with the platform setup in their own environment. This means api design should support user customizations via restful api calls (ie branding and adding new apps).
 
 **A NOTE ON ADDING APPLICATIONS: While the concept is simple at face value, this is also a large consideration as data will likely need to persist. The current state of this applciation does not address physical volumes (pv) or pvc creation.
 
