@@ -31,6 +31,8 @@ The functionality of the api endpoints as they relate to the end user perspectiv
 
 ![alt text](https://github.com/joshua-seals/gopherhelx/blob/readme-illustration/.readme-images/images/app-list-endpoints.png?raw=true)
 
+![alt text](https://github.com/joshua-seals/gopherhelx/blob/readme-illustration/.readme-images/images/dashboard-list-endpoints.png?raw=true)
+
 ## Development:
 The api service is designed to be driven by the ![Makefile](https://github.com/joshua-seals/gopherhelx/blob/main/Makefile). Following this workflow pattern will ensure consistency for all developers. Therefore updates and maintenance to ensure the makefile is current and consistent with the state of the application is critical. 
 
