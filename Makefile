@@ -2,7 +2,24 @@
 help:
 	@echo 'Usage:'
 	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' | sed -e 's/^/ /'
+# =========================================================================
+# Dev Tools (Cool but not all necessary tools)
+# Database Access
+# dblab --host 0.0.0.0 --user postgres --db postgres --pass postgres --ssl disable --port 5432 --driver postgres
+# https://github.com/danvergara/dblab
 
+# Load Testing:
+# hey -m GET -c 100 -n 10000 http://localhost:3000/app/list
+
+
+## dev.setup.mac: Install commonly used tools for the development process.
+dev.setup.mac:
+	brew update
+	brew list kind || brew install kind
+	brew list kubectl || brew install kubectl
+	brew list kustomize || brew install kustomize
+	brew list pgcli || brew install pgcli
+	brew list hey || brew install hey
 # =========================================================================
 # Building Containers
 
@@ -101,11 +118,11 @@ kind-restart-all:
 
 ## kind-status-appstore: Get status of just pods
 kind-status-appstore:
-	kubectl get pods -o wide -w
+	kubectl get pods -o wide -w -l app=appstore
 
 ## kind-status-db: Get status of the database
 kind-status-db:
-	kubectl get pods -o wide -w --namespace=appstore-system
+	kubectl get pods -o wide -w -l app=database
 
 ## kind-update: Update runs docker build and restarts the deployment with new rollout.
 # Use this if you edit application code.

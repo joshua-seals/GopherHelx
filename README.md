@@ -32,5 +32,28 @@ The functionality of the api endpoints as they relate to the end user perspectiv
 ![alt text](https://github.com/joshua-seals/gopherhelx/blob/readme-illustration/.readme-images/images/app-list-endpoints.png?raw=true)
 
 ## Development:
-The api service is designed to be driven by the Makefile.
- 
+The api service is designed to be driven by the ![Makefile](https://github.com/joshua-seals/gopherhelx/blob/main/Makefile). Following this workflow pattern will ensure consistency for all developers. Therefore updates and maintenance to ensure the makefile is current and consistent with the state of the application is critical. 
+
+### Setup
+Run `make help` to see a list of available commands within the makefile. 
+
+If on mac, running `make dev.setup.mac` will install most of the needed tools for development.
+
+After setting up, run `make image` to build the docker image of the gopherhelx api, then `make kind-up` will bring up a new kind cluster. 
+
+##### NOTE: If you have a ~/.kube/config already - you will want to rename it, as the dynamic creation of kind or minikube cluster overwrites the config file by default. 
+
+After the kind cluster has started:
+- Load the image into the cluster with `make kind-load` 
+- Add permissions so api can create pods/deployments `make kind-default-CRB`
+- Lastly apply the zarf/manifests with `make kind-apply`
+
+At this point, the cluster should be up and ready for testing.
+
+### Development Patterns
+While developing and testing inside of the `/app` folder, ie the application code, to rebuild, load, restart appstore-api with new image, you can run `make kind-update`.
+
+If doing work inside of the `/zarf` folder, ie editing dockerfiles or kubernetes manifests, you will need to run `make kind-update-apply` in order to reload the manifests.
+
+When in doubt, clean it out 🧹🫧🧼 with `make kind-down`. 
+Follow the `make image | kind-up | kind-load | kind-apply` pattern after deleting the cluster with kind-down.
