@@ -62,6 +62,10 @@ kind-default-CRB:
 	--clusterrole=cluster-admin \
 	--group=system:serviceaccounts
 
+cd-example:
+	cd ~ 
+	echo "HELLO"
+
 # kubectl create clusterrole \
 # appstore-manager-role \
 # --verb=get,list,watch,update,delete,create,patch \

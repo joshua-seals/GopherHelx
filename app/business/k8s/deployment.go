@@ -122,7 +122,7 @@ func (d *Deployment) CreateService() (string, error) {
 			Name:      d.DName + "-service",
 			Namespace: "appstore-system",
 			Labels: map[string]string{
-				"app": d.DName,
+				"user-app": d.DName,
 			},
 		},
 		Spec: apiv1.ServiceSpec{
@@ -134,7 +134,7 @@ func (d *Deployment) CreateService() (string, error) {
 					Protocol: apiv1.ProtocolTCP,
 				},
 			},
-			Selector:  map[string]string{},
+			Selector:  map[string]string{"user-app": d.DName},
 			ClusterIP: "",
 		},
 	}
