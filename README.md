@@ -16,6 +16,8 @@ The design of this application uses a base design gleened from ![ardan-labs-serv
 
 This method of organization and visualization is similar to how the OSI Model and TCP/IP models are used by engineers to speak conceptionally about different levels of a system. Additionally package oriented design allows for independent module testing.
 
+![alt text](https://github.com/joshua-seals/gopherhelx/blob/readme-illustration/.readme-images/images/package-oriented-design.png?raw=true)
+
 ### Intent
 The intent of the application redesign is to address inconsistencies observed in day to day use of the appstore api with `maintainability` , `release processes, updates` and `outside entity adoption` being a core focus. 
 
