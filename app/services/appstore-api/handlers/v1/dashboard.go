@@ -44,9 +44,10 @@ func (c CoreHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 }
 
 // StartApp deploys an application from the user dashboard to kubernetes env.
+// ** This method would orchestrate the communication of the new app to
+// the service mesh as well.
 func (c CoreHandler) StartApp(w http.ResponseWriter, r *http.Request) {
 	userId := chi.URLParam(r, "userId")
-
 	appId := chi.URLParam(r, "appId")
 
 	ctx := context.Background()
@@ -58,23 +59,30 @@ func (c CoreHandler) StartApp(w http.ResponseWriter, r *http.Request) {
 	// TODO: Need to dynamically pull namespace
 	// Ensure data follows kubernetes requirements
 	// ie. lowercase naming and remove ToLower mess.
-	cutSession := string(d.UserSession[len(d.UserSession)-7:])
-	depName := strings.ToLower(a.AppName + "-" + cutSession)
+
+	// Strip last 7 chars of session appending to AppName.
+	stripSess := string(d.UserSession[len(d.UserSession)-7:])
+	dName := strings.ToLower(a.AppName + "-" + stripSess)
 	deployment := k8s.Deployment{
-		DName:      depName,
+		DName:      dName,
 		DNamespace: "appstore-system",
 		DLabels: map[string]string{
-			"user-app": strings.ToLower(depName),
+			"user-app": strings.ToLower(dName),
 		},
 		AName:  strings.ToLower(a.AppName),
 		AImage: a.Image,
 		APort:  a.Port,
 	}
-	err = deployment.CreateDeployment()
+	dmsg, err := deployment.CreateDeployment()
 	if err != nil {
 		c.serverErrorResponse(w, r, err)
 	}
-	err = deployment.CreateService()
+	smsg, err := deployment.CreateService()
+	if err != nil {
+		c.serverErrorResponse(w, r, err)
+	}
+	data := envelope{"deployment": dmsg, "service": smsg}
+	err = c.writeJSON(w, 200, data, nil)
 	if err != nil {
 		c.serverErrorResponse(w, r, err)
 	}
@@ -95,8 +103,29 @@ func (c CoreHandler) ViewApp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c CoreHandler) AddToDashboard(w http.ResponseWriter, r *http.Request) {
-	// userId := chi.URLParam(r, "userId")
-	// appId := chi.URLParam(r, "appId")
+	userId := chi.URLParam(r, "userId")
+	appId := chi.URLParam(r, "appId")
+
+	ctx := context.Background()
+	/*
+		DIRTY CODE SECTION:
+		This is a little rough and ready but works for now.
+		⏰ Last day time crunch.
+	*/
+	userDash, err := models.GetDashboard(ctx, c.DB, userId)
+	if err != nil {
+		c.serverErrorResponse(w, r, err)
+	}
+	// Inferring user session here - the dirty part.
+	err = userDash[0].AddToDashboard(ctx, c.DB, appId)
+	if err != nil {
+		c.serverErrorResponse(w, r, err)
+	}
+	/*
+		End of dirty code section
+	*/
+	data := envelope{"success": "App added to dashboard"}
+	c.writeJSON(w, 200, data, nil)
 }
 
 // RemoveApp will uninstall the applicaiton from the user dashboard.

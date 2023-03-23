@@ -15,18 +15,19 @@ help:
 ## dev.setup.mac: Install commonly used tools for the development process.
 dev.setup.mac:
 	brew update
+	brew list go || brew install go
 	brew list kind || brew install kind
 	brew list kubectl || brew install kubectl
 	brew list kustomize || brew install kustomize
-	brew list pgcli || brew install pgcli
-	brew list hey || brew install hey
+	brew list jq || brew install jq
+# brew list hey || brew install hey
 # =========================================================================
 # Building Containers
 
-## VERSION: of application to set.
+## VERSION: Version of application to set.
 VERSION := 1.0.0
 
-## all: run appstore-api to build docker image.
+## image: run appstore-api to build docker image.
 image: appstore-api
 
 ## appstore-api: Build docker image for api from zarf/docker/dockerfile.appstore-api
@@ -42,10 +43,10 @@ appstore-api:
 # KIND image release info at project: github.com/kubernetes-sigs/kind/releases/tag/[your version of kind]
 # Running from within k8s/kind
 
-## KIND_CLUSTER: Kind cluster name
+## KIND_CLUSTER: Kind cluster name default 'gopherhelx-cluster'
 KIND_CLUSTER := gopherhelx-cluster 
 
-## kind-up: Start new cluster, set context to appstore-system, reference kind for patching.
+## kind-up: Start new cluster, set namespace 'appstore-system', patching changes.
 kind-up:
 	kind create cluster \
 		--image kindest/node:v1.25.3@sha256:f52781bc0d7a19fb6c405c2af83abfeb311f130707a0e219175677e366cc45d1 \
@@ -53,7 +54,7 @@ kind-up:
 		--config zarf/k8s/kind/kind-config.yml
 	kubectl config set-context --current --namespace=appstore-system
 
-## kind-default-CRB: Create cr and crbinding for appstore to manage pods and services.
+## kind-default-CRB: Create cluster rolebinding for api to manage deployments/services.
 # Only needed to run once when first creating cluster.
 # Still honing this so for hacking, it is cluster-admin roles (VERY INSECURE!!!)
 kind-default-CRB:
@@ -84,13 +85,13 @@ kind-default-CRB:
 kind-down:
 	kind delete cluster --name $(KIND_CLUSTER)
 
-## kind-load: Use kustomize to replace our VERSION from VERSION in makefile. Load image into cluster
+## kind-load: Load image into cluster.
 kind-load:
 	cd zarf/k8s/kind/appstore; kustomize edit set image appstore-api-image=appstore-api-arm64:$(VERSION)
 	kind load docker-image appstore-api-arm64:$(VERSION) --name $(KIND_CLUSTER)
 
 # Load db first, wait 120, then apply appstore api
-## kind-apply: Apply kustomize build into kubernetes.
+## kind-apply: Apply manifest and kustomize patches into kubernetes.
 kind-apply:
 	kustomize build zarf/k8s/kind/database | kubectl apply -f -
 	kubectl wait --namespace=appstore-system --timeout=120s --for=condition=Available deployment/database-pod
@@ -102,7 +103,7 @@ kind-status:
 	kubectl get svc -o wide
 	kubectl get pods -o wide 
 
-## kind-logs: See last 100 logs for appstore
+## kind-logs: Actively watch logging, starting at last 100 logs.
 kind-logs:
 	kubectl logs -l app=appstore -f --tail=100 
 
@@ -111,16 +112,16 @@ kind-restart:
 	kubectl rollout restart deployment appstore-api
 
 
-## kind-restart-all: Rollout and restart new deployment of appstore-api and database-pod
+## kind-restart-all: Rollout and restart new deployments api and db.
 kind-restart-all:
 	kubectl rollout restart deployment appstore-api
 	kubectl rollout restart deployment database-pod
 
-## kind-status-appstore: Get status of just pods
+## kind-status-appstore: Get status of just api pod
 kind-status-appstore:
 	kubectl get pods -o wide -w -l app=appstore
 
-## kind-status-db: Get status of the database
+## kind-status-db: Get status of the database pod
 kind-status-db:
 	kubectl get pods -o wide -w -l app=database
 

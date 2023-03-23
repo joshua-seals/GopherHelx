@@ -27,7 +27,8 @@ type Application struct {
 // Apps is a slice of Applicaiton.
 type Apps []Application
 
-// Returns the newly installed appId and error.
+// AddNewApplication installs new applications into the database
+// returning the id of app_id upon success.
 func (a *Application) AddNewApplication(ctx context.Context, db *sqlx.DB) (string, error) {
 
 	if err := database.StatusCheck(ctx, db); err != nil {
@@ -63,6 +64,8 @@ func (a *Application) AddNewApplication(ctx context.Context, db *sqlx.DB) (strin
 
 }
 
+// AppList returns a list of applications available
+// to be installed in the user dashboard.
 func AppList(ctx context.Context, db *sqlx.DB) (Apps, error) {
 
 	if err := database.StatusCheck(ctx, db); err != nil {

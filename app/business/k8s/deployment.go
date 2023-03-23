@@ -45,16 +45,16 @@ func int32Ptr(i int32) *int32 { return &i }
 // This function will govern the Deployments.
 // And a struct containing pertinent information will be populated and
 // passed to CreateDeployment() for creation.
-func (d *Deployment) CreateDeployment() error {
+func (d *Deployment) CreateDeployment() (string, error) {
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		return err
+		return "", err
 	}
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	deploymentsClient := clientset.AppsV1().Deployments("appstore-system")
@@ -95,23 +95,25 @@ func (d *Deployment) CreateDeployment() error {
 	fmt.Println("Creating deployment...")
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
+	// Print for record in log but return the same as a message.
+	fmt.Printf("Created deployment %q. \n", result.GetObjectMeta().GetName())
+	msg := fmt.Sprintf(" %q ", result.GetObjectMeta().GetName())
 
-	return nil
+	return msg, nil
 }
 
-func (d *Deployment) CreateService() error {
+func (d *Deployment) CreateService() (string, error) {
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		return err
+		return "", err
 	}
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	servicesClient := clientset.CoreV1().Services("appstore-system")
@@ -141,10 +143,12 @@ func (d *Deployment) CreateService() error {
 	fmt.Println("Creating service...")
 	result, err := servicesClient.Create(context.TODO(), service, metav1.CreateOptions{})
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
-	return nil
+	// Print for log record return message for user.
+	fmt.Printf("Created service %q .\n", result.GetObjectMeta().GetName())
+	msg := fmt.Sprintf("%q ", result.GetObjectMeta().GetName())
+	return msg, nil
 }
 
 func ListDeployment() {
