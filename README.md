@@ -74,4 +74,5 @@ These features will also need to be addressed:
 - User Persistence
 - Authentication
 - Authorization
+
 Currently, there are two paths for authorization, but they should be prioritized after the service mesh is established. 
