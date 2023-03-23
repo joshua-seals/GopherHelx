@@ -59,3 +59,19 @@ If doing work inside of the `/zarf` folder, ie editing dockerfiles or kubernetes
 
 When in doubt, clean it out 🧹🫧🧼 with `make kind-down`. 
 Follow the `make image | kind-up | kind-load | kind-apply` pattern after deleting the cluster with kind-down.
+
+## And Yet
+
+This api is a good foundation, and yet the most critical aspect has not been addressed, the `service mesh`. Once the Deployment and Services are created for the applications, we still need to `dynamically` inject routing into them to present to the end user, as well as keep a running map of those users and their services. Currently, ![Consul](https://developer.hashicorp.com/consul/docs/connect) is the top consideration for service mesh due to it's heavy focus on opensource, educational and thorough app documentation. 
+
+
+## Additionally 
+
+These features will also need to be addressed:
+- Validation 
+- Testing (Module Testing was not prioritized)
+- Middleware (catching panics, logging persistance, observability)
+- User Persistence
+- Authentication
+- Authorization
+Currently, there are two paths for authorization, but they should be prioritized after the service mesh is established. 

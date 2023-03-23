@@ -58,18 +58,23 @@ func (c CoreHandler) StartApp(w http.ResponseWriter, r *http.Request) {
 	// TODO: Need to dynamically pull namespace
 	// Ensure data follows kubernetes requirements
 	// ie. lowercase naming and remove ToLower mess.
-	depName := strings.ToLower(a.AppName + "-" + d.UserSession)
+	cutSession := string(d.UserSession[len(d.UserSession)-7:])
+	depName := strings.ToLower(a.AppName + "-" + cutSession)
 	deployment := k8s.Deployment{
 		DName:      depName,
 		DNamespace: "appstore-system",
 		DLabels: map[string]string{
-			"apps": strings.ToLower(a.AppName),
+			"user-app": strings.ToLower(depName),
 		},
 		AName:  strings.ToLower(a.AppName),
 		AImage: a.Image,
 		APort:  a.Port,
 	}
 	err = deployment.CreateDeployment()
+	if err != nil {
+		c.serverErrorResponse(w, r, err)
+	}
+	err = deployment.CreateService()
 	if err != nil {
 		c.serverErrorResponse(w, r, err)
 	}

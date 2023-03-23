@@ -21,18 +21,23 @@ import (
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 )
 
+/*
+	TODO: Service Protocol needs to be dynamic
+		  Namespace needs to be dynamic - currently hard coded.
+*/
+
 var (
 	//go:embed helx-apps/*
 	helxFs embed.FS
 )
 
 type Deployment struct {
-	DName      string            // Username + AppName
+	DName      string            // AppName + UserSession Slice
 	DNamespace string            // CurrentNamespace
-	DLabels    map[string]string // app=DName
+	DLabels    map[string]string // user-app=DName
 	AName      string            // AppName
 	AImage     string            // AppImage
-	APort      int               //AppPort
+	APort      int               // AppPort
 }
 
 func int32Ptr(i int32) *int32 { return &i }
@@ -93,12 +98,53 @@ func (d *Deployment) CreateDeployment() error {
 		return err
 	}
 	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
-	// Call createService() to expose the deployment.
+
 	return nil
 }
 
-func createService() {
-	// service := apiv1.Service{}
+func (d *Deployment) CreateService() error {
+	// creates the in-cluster config
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		return err
+	}
+	// creates the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return err
+	}
+
+	servicesClient := clientset.CoreV1().Services("appstore-system")
+	service := &apiv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      d.DName + "-service",
+			Namespace: "appstore-system",
+			Labels: map[string]string{
+				"app": d.DName,
+			},
+		},
+		Spec: apiv1.ServiceSpec{
+			// TODO: Make this prettier and Protocol not dynamic
+			Ports: []apiv1.ServicePort{
+				{
+					Name:     d.AName,
+					Port:     int32(d.APort),
+					Protocol: apiv1.ProtocolTCP,
+				},
+			},
+			Selector:  map[string]string{},
+			ClusterIP: "",
+		},
+	}
+
+	// Create Service
+	fmt.Println("Creating service...")
+	result, err := servicesClient.Create(context.TODO(), service, metav1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Created deployment %q.\n", result.GetObjectMeta().GetName())
+	return nil
 }
 
 func ListDeployment() {
