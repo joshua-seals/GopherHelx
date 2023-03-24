@@ -34,6 +34,8 @@ spec:
           containerPort: 3000
         - name: appstore-debug
           containerPort: 4000
+        - name: swagger-docs
+          containerPort: 1323
         # Using Kubernetes downward api to pass info to our 
         # readiness and liveness probes.
         env:
@@ -89,3 +91,6 @@ spec:
   - port: 4000
     name: appstore-debug
     targetPort: appstore-debug
+  - port: 1323
+    name: swagger-docs
+    targetPort: swagger-docs

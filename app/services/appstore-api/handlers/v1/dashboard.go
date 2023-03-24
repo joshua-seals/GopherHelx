@@ -19,14 +19,21 @@ import (
 // Dashboard shows the installed applications in the user
 // specific dashboard. Dashboard is the entrypoint for
 // users to start and stop applications.
+
+// Dashboard godoc
+//
+//	@Summary		Dashboard
+//	@Description	return specific user dashboard view
+//	@Produce		json
+//	@Success		200	{string}	string "ok"
+//	@Failure		400	{string}	string	"ok"
+//	@Failure		404	{string}	string	"ok"
+//	@Failure		500	{string}	string	"ok"
+//	@Router			/dashboard/{userId} [get]
 func (c CoreHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 
-	// userId, err := strconv.Atoi(chi.URLParam(r, "userId"))
 	userId := chi.URLParam(r, "userId")
-	// if err != nil {
-	// 	c.serverErrorResponse(w, r, err)
-	// 	return
-	// }
+
 	ctx := context.Background()
 	userDash, err := models.GetDashboard(ctx, c.DB, userId)
 
