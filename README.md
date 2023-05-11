@@ -64,7 +64,9 @@ Follow the `make image | kind-up | kind-load | kind-apply` pattern after deletin
 
 ## And Yet
 
-This api is a good foundation, and yet the most critical aspect has not been addressed, the `service mesh`. Once the Deployment and Services are created for the applications, we still need to `dynamically` inject routing into them to present to the end user, as well as keep a running map of those users and their services. Currently, ![Consul](https://developer.hashicorp.com/consul/docs/connect) is the top consideration for service mesh due to it's heavy focus on opensource, educational and thorough app documentation. 
+This api is a good foundation, and yet the most critical aspect has not been addressed, the `service discovery`. Currently it is possible to leverage CoreDNS in Kubernetes and simply route to newly created services via A or SVC record. Additionally, a `service mesh` could add great value as the platform expands. Currently, ![Consul](https://developer.hashicorp.com/consul/docs/connect) is the top consideration for service mesh and discovery due to it's heavy focus on opensource, educational and thorough app documentation. With Consul the traffic can be shaped, limiting access from pods to others such as the dataabase or authentication service. A proposed architecture could look like below, though as more knowledge of consul grows this will likely change. 
+
+![alt text](https://github.com/joshua-seals/gopherhelx/blob/readme-illustration/.readme-images/images/dashboard-list-endpoints.png?raw=true)
 
 
 ## Additionally 
