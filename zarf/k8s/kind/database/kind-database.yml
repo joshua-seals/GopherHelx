@@ -16,6 +16,8 @@ spec:
   strategy: {}
   template:
     metadata:
+      annotations:
+        consul.hashicorp.com/connect-inject: 'true'
       labels:
         app: database
     spec:

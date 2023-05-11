@@ -167,3 +167,22 @@ audit:
 	@echo 'Vetting code...'
 	go vet ./...
 
+#===================================================================
+# consul can be accessed with:
+#		kubectl port-forward svc/consul-ui --namespace consul 8501:443
+# Note: It uses a self signed certificate.
+#
+#
+#
+#	helm repo add hashicorp https://helm.releases.hashicorp.com
+#	helm install --values zarf/consul/values.yml consul hashicorp/consul --create-namespace --namespace consul --version "1.0.0"
+#
+consul-check:
+	kubectl get pods --namespace consul
+
+# Get Login Secret for Consul Interface
+#
+#	export CONSUL_HTTP_TOKEN=$(kubectl get --namespace consul secrets/consul-bootstrap-acl-token --template={{.data.token}} | base64 -d)
+#	export CONSUL_HTTP_ADDR=https://127.0.0.1:8501
+#	export CONSUL_HTTP_SSL_VERIFY=false
+#
