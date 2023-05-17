@@ -5,10 +5,6 @@ import (
 	"net/http"
 )
 
-var (
-	ErrInternalServer = http.StatusInternalServerError
-)
-
 // This collection of methods will standardize our errorResponses
 // as well as error logging that clients see. logError, errorResponse, &
 // serverErrorResponse are currently unexported.
