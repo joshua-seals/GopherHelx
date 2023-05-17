@@ -20,21 +20,6 @@ import (
 
 var build = "develop"
 
-// @title GopherHelx Appstore Api
-// @version 1.0
-// @description This api is the core functionality of the helxplatform.
-//	@termsOfService	http://www.renci.org/gopherhelx-terms-of-service
-
-//	@contact.name	Joshua Seals
-//	@contact.url	http://www.renci.org/contact
-//	@contact.email	jtseals@renci.org
-
-//	@license.name	MIT
-//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
-
-//	@host		localhost:3000
-//
-// @BasePath	/swagger
 func main() {
 
 	// Construct the application logger.
