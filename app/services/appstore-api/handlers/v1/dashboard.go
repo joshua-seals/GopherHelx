@@ -4,7 +4,9 @@ package v1
 
 import (
 	"context"
+	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -26,6 +28,13 @@ import (
 func (c CoreHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 
 	userId := chi.URLParam(r, "userId")
+	// Ensure userId is a valid number, before touching the db.
+	_, err := strconv.Atoi(userId)
+	if err != nil {
+		errormsg := errors.New("userId was not valid")
+		c.serverErrorResponse(w, r, errormsg)
+		return
+	}
 
 	ctx := context.Background()
 	userDash, err := models.GetDashboard(ctx, c.DB, userId)
