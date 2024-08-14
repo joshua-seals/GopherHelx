@@ -4,7 +4,9 @@ package v1
 
 import (
 	"context"
+	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -16,17 +18,24 @@ import (
 *	TODO: Dynamically pull namespace info. Currently hard coded.
  */
 
-// Dashboard shows the installed applications in the user
-// specific dashboard. Dashboard is the entrypoint for
-// users to start and stop applications.
+// swagger:route GET /dashboard/{userId} dashboard Dashboard
+// Returns the user dashboard associated with the provided userId.
+// The dashboard is a list of all applications installed and current session.
+// parameters: userId
+// responses:
+//
+//	200: userDashboard
 func (c CoreHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 
-	// userId, err := strconv.Atoi(chi.URLParam(r, "userId"))
 	userId := chi.URLParam(r, "userId")
-	// if err != nil {
-	// 	c.serverErrorResponse(w, r, err)
-	// 	return
-	// }
+	// Ensure userId is a valid number, before touching the db.
+	_, err := strconv.Atoi(userId)
+	if err != nil {
+		errormsg := errors.New("userId was not valid")
+		c.serverErrorResponse(w, r, errormsg)
+		return
+	}
+
 	ctx := context.Background()
 	userDash, err := models.GetDashboard(ctx, c.DB, userId)
 
@@ -46,6 +55,13 @@ func (c CoreHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 // StartApp deploys an application from the user dashboard to kubernetes env.
 // ** This method would orchestrate the communication of the new app to
 // the service mesh as well.
+
+// swagger:route PUT /dashboard/{userId}/start/{appId} dashboard StartApp
+// Deploys an application from user dashboard into kubernetes environment.
+//
+// responses:
+//
+//	200: startApplicaiton
 func (c CoreHandler) StartApp(w http.ResponseWriter, r *http.Request) {
 	userId := chi.URLParam(r, "userId")
 	appId := chi.URLParam(r, "appId")
@@ -102,6 +118,11 @@ func (c CoreHandler) ViewApp(w http.ResponseWriter, r *http.Request) {
 	k8s.ListDeployment()
 }
 
+// swagger: route POST /dashboard/{userId}/install/{appId} dashboard AddToDashboard
+// Associate an applicaiton from app/list to a specific user dashboard.
+// responses:
+//
+//	200: addToDashSuccess
 func (c CoreHandler) AddToDashboard(w http.ResponseWriter, r *http.Request) {
 	userId := chi.URLParam(r, "userId")
 	appId := chi.URLParam(r, "appId")

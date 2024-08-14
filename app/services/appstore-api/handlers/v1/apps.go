@@ -10,8 +10,11 @@ import (
 	"github.com/joshua-seals/gopherhelx/app/business/data/models"
 )
 
-// Applist shows the list of applications available
-// for a user to install in their dashboard.
+// swagger:route GET /app/list apps appList
+// Returns list of applications available for use on helxplatform.
+// responses:
+//
+//	200: appsResponse
 func (c CoreHandler) AppList(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	apps, err := models.AppList(ctx, c.DB)
@@ -30,7 +33,12 @@ func (c CoreHandler) AppList(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// NewApplication supports the installation of a new application.
+// swagger:route POST /app/new apps newApplication
+// Expects an Application definition
+// Responds Success or Error Json Response
+// responses:
+//
+//	200: newApplication
 func (c CoreHandler) NewApplication(w http.ResponseWriter, r *http.Request) {
 
 	newApp := models.Application{}

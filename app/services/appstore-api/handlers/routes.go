@@ -1,3 +1,5 @@
+// package handlers creates all the routes for the program
+// and returns the routers/muxes that manage them.
 package handlers
 
 import (
@@ -7,8 +9,10 @@ import (
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
+	apiMiddleware "github.com/go-openapi/runtime/middleware"
 	"github.com/jmoiron/sqlx"
 	v1 "github.com/joshua-seals/gopherhelx/app/services/appstore-api/handlers/v1"
+
 	"go.uber.org/zap"
 )
 
@@ -88,4 +92,15 @@ func DebugMux(build string, log *zap.SugaredLogger, db *sqlx.DB) http.Handler {
 	mux.HandleFunc("/debug/liveness", dbug.Liveness)
 
 	return mux
+}
+
+func SwaggerRoutes() *chi.Mux {
+	swag_router := chi.NewRouter()
+
+	ops := apiMiddleware.RedocOpts{SpecURL: "/swagger.yaml"}
+	sh := apiMiddleware.Redoc(ops, nil)
+
+	swag_router.Handle("/docs", sh)
+	swag_router.Handle("/swagger.yaml", http.FileServer(http.Dir("./appstore-api/swagger/")))
+	return swag_router
 }

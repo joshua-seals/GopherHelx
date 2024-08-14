@@ -15,10 +15,24 @@ import (
 // Dashboard is the model structure
 // for our database transactions. DashId
 // corresponds directly to user_id.
+
+// swagger:model
 type Dashboard struct {
-	DashID      int    `db:"users_dash_id" json:"dash_id,omitempty"`
+	// the id for the dashboard/user
+	//
+	// required: true
+	// min: 1
+	DashID int `db:"users_dash_id" json:"dash_id,omitempty"`
+
+	// the session token for the user
+	//
+	// required: false
 	UserSession string `db:"users_session" json:"user_session"`
-	AppID       int    `db:"apps_app_id" json:"app_id"`
+
+	// the application id installed in the user dashboard
+	//
+	// required: false
+	AppID int `db:"apps_app_id" json:"app_id"`
 }
 
 // The dashboard struct is good for one new entry

@@ -1,0 +1,189 @@
+basePath: /
+consumes:
+    - application/json
+    - application/yaml
+definitions:
+    Application:
+        properties:
+            app_id:
+                description: the id for the product
+                format: int64
+                minimum: 1
+                type: integer
+                x-go-name: AppID
+            app_name:
+                description: the name of the application
+                example: scipy
+                type: string
+                x-go-name: AppName
+            image:
+                description: the image of the application
+                example: helxplatform/scipy
+                type: string
+                x-go-name: Image
+            port:
+                description: the port for the application
+                example: 8888
+                format: int64
+                type: integer
+                x-go-name: Port
+        required:
+            - app_name
+            - image
+            - port
+        title: Application defines the structure for an Application.
+        type: object
+        x-go-package: github.com/joshua-seals/gopherhelx/app/business/data/models
+    Dashboard:
+        properties:
+            app_id:
+                description: the application id installed in the user dashboard
+                format: int64
+                type: integer
+                x-go-name: AppID
+            dash_id:
+                description: the id for the dashboard/user
+                format: int64
+                minimum: 1
+                type: integer
+                x-go-name: DashID
+            user_session:
+                description: the session token for the user
+                type: string
+                x-go-name: UserSession
+        required:
+            - dash_id
+        type: object
+        x-go-package: github.com/joshua-seals/gopherhelx/app/business/data/models
+host: localhost:3000
+info:
+    contact:
+        email: jseals@renci.org
+        name: Joshua Seals
+    description: |-
+        The purpose of this application is to provide a
+        pluggable REST interface to the helxplatform that
+        will act as orchestrator among varying microservices.
+    license:
+        name: MIT
+        url: http://opensource.org/licenses/MIT
+    termsOfService: there are no TOS at this moment, use at your own risk we take no responsibility
+    title: GopherHelx API.
+    version: 1.0.0
+paths:
+    /app/list:
+        get:
+            operationId: appList
+            responses:
+                "200":
+                    $ref: '#/responses/appsResponse'
+            summary: Returns list of applications available for use on helxplatform.
+            tags:
+                - apps
+    /app/new:
+        post:
+            description: |-
+                Expects an Application definition
+                Responds Success or Error Json Response
+            operationId: newApplication
+            parameters:
+                - description: the name of the application
+                  example: scipy
+                  in: query
+                  name: app_name
+                  required: true
+                  type: string
+                  x-go-name: AppName
+                - description: the image of the application
+                  example: helxplatform/scipy
+                  in: query
+                  name: image
+                  required: true
+                  type: string
+                  x-go-name: Image
+                - description: the port for the application
+                  example: 8888
+                  format: int64
+                  in: query
+                  name: port
+                  required: true
+                  type: integer
+                  x-go-name: Port
+            responses:
+                "200":
+                    $ref: '#/responses/newApplication'
+            tags:
+                - apps
+    /dashboard/{userId}:
+        get:
+            description: The dashboard is a list of all applications installed and current session.
+            operationId: Dashboard
+            responses:
+                "200":
+                    $ref: '#/responses/userDashboard'
+            summary: Returns the user dashboard associated with the provided userId.
+            tags:
+                - dashboard
+    /dashboard/{userId}/start/{appId}:
+        put:
+            operationId: StartApp
+            responses:
+                "200":
+                    $ref: '#/responses/startApplicaiton'
+            summary: Deploys an application from user dashboard into kubernetes environment.
+            tags:
+                - dashboard
+produces:
+    - application/json
+responses:
+    addToDashSuccess:
+        description: Successfully Added an App to the User Dashboard
+        schema:
+            properties:
+                Success:
+                    description: Success Response for added App
+                    example: App added to dashboard
+                    type: string
+            required:
+                - Success
+            type: object
+    appsResponse:
+        description: ""
+        schema:
+            items:
+                $ref: '#/definitions/Application'
+            type: array
+    newApplication:
+        description: ""
+        schema:
+            properties:
+                Success:
+                    description: Success message with appID
+                    example: "117"
+                    type: string
+            type: object
+    startApplicaiton:
+        description: The name of the deployment and service created.
+        schema:
+            properties:
+                Deployment:
+                    description: Deployment name
+                    example: postgresql-pdry9f2
+                    type: string
+                Services:
+                    description: Service name to connect to deployment
+                    example: postgresql-pdry9f2-service
+                    type: string
+            required:
+                - Deployment
+                - Services
+            type: object
+    userDashboard:
+        description: ""
+        schema:
+            items:
+                $ref: '#/definitions/Dashboard'
+            type: array
+schemes:
+    - http
+swagger: "2.0"

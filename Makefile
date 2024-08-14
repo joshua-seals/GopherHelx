@@ -167,3 +167,12 @@ audit:
 	@echo 'Vetting code...'
 	go vet ./...
 
+## swagger-gen: Generate swagger spec
+swagger-doc-gen:
+	swagger generate spec -o ./app/services/appstore-api/swagger/swagger.yaml --scan-models
+
+go-vuln-install:
+	go install golang.org/x/vuln/cmd/govulncheck@latest
+
+go-vuln-scan:
+	govulncheck ./...

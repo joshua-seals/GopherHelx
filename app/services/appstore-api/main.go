@@ -52,6 +52,7 @@ func run(log *zap.SugaredLogger) error {
 		Web struct {
 			APIHOST         string        `conf:"default:0.0.0.0:3000"`
 			DebugHost       string        `conf:"default:0.0.0.0:4000"`
+			Swagger         string        `conf:"default:0.0.0.0:1323"`
 			ReadTimeout     time.Duration `conf:"default:5s"`
 			WriteTimeout    time.Duration `conf:"default:10s"`
 			IdleTimeout     time.Duration `conf:"default:120s"`
@@ -133,6 +134,21 @@ func run(log *zap.SugaredLogger) error {
 	go func() {
 		if err := http.ListenAndServe(cfg.Web.DebugHost, debugMux); err != nil {
 			log.Errorw("shutdown", "status", "debug router closed", "host", cfg.Web.DebugHost, "ERROR", err)
+		}
+	}()
+	//================================================================
+	// Start Swagger
+
+	log.Infow("startup", "status", "debug router started", "host", cfg.Web.Swagger)
+
+	// Create Swagger Router
+	swagMux := handlers.SwaggerRoutes()
+
+	// Start the service listening for debug requests.
+	// Not concerned with shutting this down with load shedding, ie don't need custom http.Server object
+	go func() {
+		if err := http.ListenAndServe(cfg.Web.Swagger, swagMux); err != nil {
+			log.Errorw("shutdown", "status", "debug router closed", "host", cfg.Web.Swagger, "ERROR", err)
 		}
 	}()
 

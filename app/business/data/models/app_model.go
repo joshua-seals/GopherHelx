@@ -17,14 +17,36 @@ import (
 // We add the Deployment, Namespace, PodName and labels
 // based on the specific user context parsed when a
 // user requests to start an app.
+//
+
+// Application defines the structure for an Application.
+// swagger:model
 type Application struct {
-	AppID   int    `db:"app_id" json:"app_id,omitempty"`
-	AppName string `db:"app_name" json:"app_name"`
-	Image   string `db:"image" json:"image"`
-	Port    int    `db:"port" json:"port"`
+	// the id for the product
+	//
+	// required: false
+	// min: 1
+	AppID int `json:"app_id,omitempty" db:"app_id"`
+
+	// the name of the application
+	//
+	// required: true
+	// example: scipy
+	AppName string `json:"app_name" db:"app_name"`
+
+	// the image of the application
+	//
+	// required: true
+	// example: helxplatform/scipy
+	Image string `json:"image" db:"image"`
+
+	// the port for the application
+	//
+	// required: true
+	// example: 8888
+	Port int `json:"port" db:"port"`
 }
 
-// Apps is a slice of Applicaiton.
 type Apps []Application
 
 // AddNewApplication installs new applications into the database
